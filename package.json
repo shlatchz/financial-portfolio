@@ -1,0 +1,74 @@
+{
+  "name": "portfolio-manager",
+  "version": "1.0.0",
+  "description": "A modern React investment portfolio management system with real-time market data integration, advanced analytics, and intelligent rebalancing recommendations.",
+  "type": "module",
+  "author": {
+    "name": "Rony Fragin",
+    "email": "shlatchz@gmail.com"
+  },
+  "license": "MIT",
+  "keywords": [
+    "portfolio",
+    "investment",
+    "finance",
+    "react",
+    "typescript",
+    "material-ui",
+    "tase",
+    "stocks",
+    "bonds",
+    "rebalancing",
+    "analytics",
+    "dashboard"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ronyfragin/portfolio-manager.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ronyfragin/portfolio-manager/issues"
+  },
+  "homepage": "https://github.com/ronyfragin/portfolio-manager#readme",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 5",
+    "lint:fix": "eslint . --ext ts,tsx --fix",
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf dist node_modules/.vite",
+    "setup-env": "./setup-env.sh",
+    "start": "npm run dev",
+    "test": "echo \"No tests yet\" && exit 0"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
+    "@mui/icons-material": "^5.15.0",
+    "@mui/material": "^5.15.0",
+    "@mui/x-charts": "^6.18.0",
+    "@tanstack/react-query": "^5.17.0",
+    "axios": "^1.6.2",
+    "decimal.js": "^10.5.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/decimal.js": "^7.4.3",
+    "@types/react": "^18.2.45",
+    "@types/react-dom": "^18.2.18",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
+    "@vitejs/plugin-react": "^4.2.1",
+    "eslint": "^8.55.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.5",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.8"
+  }
+}
