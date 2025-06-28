@@ -9,9 +9,8 @@ import {
   Chip,
   Stack,
   Paper,
-  Avatar,
 } from '@mui/material';
-import { CloudUpload, Cable } from '@mui/icons-material';
+import { Cable } from '@mui/icons-material';
 import { useTheme } from '@mui/material/styles';
 import { env } from '../config/env';
 import { GoogleSheetsService, CustomSecurity } from '@portfolio/core';
@@ -125,36 +124,6 @@ const PortfolioForm: React.FC<PortfolioFormProps> = ({ onAnalyze, isLoading = fa
       }}
     >
       <CardContent sx={{ p: 4 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 4 }}>
-          <Avatar
-            sx={{
-              width: 56,
-              height: 56,
-              background: theme.portfolioColors.gradients.primary,
-              mr: 3,
-              boxShadow: '0 8px 24px rgba(99, 102, 241, 0.3)',
-            }}
-          >
-            <CloudUpload sx={{ fontSize: 28, color: 'white' }} />
-          </Avatar>
-          <Box>
-            <Typography 
-              variant="h5" 
-              component="h2" 
-              sx={{ 
-                fontWeight: 700,
-                ...COMMON_STYLES.GRADIENT_TEXT(theme.portfolioColors.gradients.primary),
-                mb: 0.5,
-              }}
-            >
-              Portfolio Data Source
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Connect your Google Sheets portfolio for analysis and auto-configure AI tools
-            </Typography>
-          </Box>
-        </Box>
-
         <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
           <TextField
             fullWidth

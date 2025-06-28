@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { QueryClient, QueryClientProvider, useQueryClient } from '@tanstack/react-query';
 import { ThemeProvider } from '@mui/material/styles';
-import { CssBaseline, Container, Typography, Box, CircularProgress, Stack, Alert, Paper, Fade, Grow } from '@mui/material';
-import { TrendingUp } from '@mui/icons-material';
+import { CssBaseline, Container, Typography, Box, CircularProgress, Stack, Alert, Paper, Fade, Grow, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
+import { TrendingUp, ExpandMore, CloudUpload, SmartToy } from '@mui/icons-material';
 import { portfolioTheme } from './theme';
 import PortfolioForm from './components/PortfolioForm';
 import PortfolioSummaryCards from './components/PortfolioSummaryCards';
@@ -39,6 +39,8 @@ const PortfolioApp: React.FC = () => {
   const [envInfo, setEnvInfo] = useState<ReturnType<typeof getEnvInfo> | null>(null);
   const [mcpConfigured, setMcpConfigured] = useState(false);
   const [mcpConfigError, setMcpConfigError] = useState<string | null>(null);
+  const [portfolioFormExpanded, setPortfolioFormExpanded] = useState(true);
+  const [mcpPanelExpanded, setMcpPanelExpanded] = useState(false);
   
   const queryClientInstance = useQueryClient();
   const mcpService = new McpApiService();
@@ -77,6 +79,9 @@ const PortfolioApp: React.FC = () => {
       
       // Also auto-configure MCP service with default distribution
       configureMcpService(env.defaultSpreadsheetUrl, env.defaultGoogleSheetsApiKey, env.fundsTypeDistributionBond, env.fundsTypeDistributionShare, env.customSecurities);
+      
+      // Expand MCP panel when auto-start is enabled
+      setMcpPanelExpanded(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -115,6 +120,9 @@ const PortfolioApp: React.FC = () => {
     
     // Also configure MCP service automatically with user-specified allocation and custom securities
     await configureMcpService(url, key, bondPercentage, sharePercentage, customSecuritiesParam);
+    
+    // Expand MCP panel after successful analysis to show AI tools
+    setMcpPanelExpanded(true);
   };
 
   const renderContent = () => {
@@ -384,24 +392,150 @@ const PortfolioApp: React.FC = () => {
           </Fade>
         )}
 
-        {/* Portfolio Form */}
+        {/* Portfolio Form Accordion */}
         <Grow in timeout={APP_CONFIG.ANIMATION.NORMAL}>
           <Box sx={{ mb: 6 }}>
-            <PortfolioForm 
-              onAnalyze={handleAnalyze}
-              isLoading={isLoading || isReanalyzing}
-              error={error instanceof Error ? error.message : null}
-            />
+            <Accordion 
+              expanded={portfolioFormExpanded} 
+              onChange={(_, isExpanded) => setPortfolioFormExpanded(isExpanded)}
+              elevation={0}
+              sx={{
+                ...COMMON_STYLES.GLASS_MORPHISM,
+                borderRadius: APP_CONFIG.UI.CARD_BORDER_RADIUS,
+                overflow: 'hidden',
+                '&:before': {
+                  display: 'none',
+                },
+                '& .MuiAccordionSummary-root': {
+                  background: 'rgba(255, 255, 255, 0.9)',
+                  borderRadius: `${APP_CONFIG.UI.CARD_BORDER_RADIUS}px ${APP_CONFIG.UI.CARD_BORDER_RADIUS}px 0 0`,
+                  minHeight: 72,
+                  '&.Mui-expanded': {
+                    minHeight: 72,
+                  },
+                },
+                '& .MuiAccordionDetails-root': {
+                  padding: 0,
+                  background: 'transparent',
+                },
+              }}
+            >
+              <AccordionSummary
+                expandIcon={<ExpandMore />}
+                sx={{
+                  '& .MuiAccordionSummary-content': {
+                    alignItems: 'center',
+                    margin: '16px 0',
+                    '&.Mui-expanded': {
+                      margin: '16px 0',
+                    },
+                  },
+                }}
+              >
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                  <CloudUpload 
+                    sx={{ 
+                      fontSize: 28, 
+                      mr: 2,
+                      color: portfolioTheme.portfolioColors.primary.main 
+                    }} 
+                  />
+                  <Box>
+                    <Typography variant="h5" sx={{ fontWeight: 700, mb: 0.5 }}>
+                      Portfolio Data Source
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Configure your Google Sheets portfolio and target allocation
+                    </Typography>
+                  </Box>
+                </Box>
+              </AccordionSummary>
+              <AccordionDetails>
+                <PortfolioForm 
+                  onAnalyze={handleAnalyze}
+                  isLoading={isLoading || isReanalyzing}
+                  error={error instanceof Error ? error.message : null}
+                />
+              </AccordionDetails>
+            </Accordion>
           </Box>
         </Grow>
 
-        {/* MCP AI Tools Panel */}
+        {/* MCP AI Tools Accordion */}
         <Fade in timeout={APP_CONFIG.ANIMATION.NORMAL} style={{ transitionDelay: '350ms' }}>
           <Box sx={{ mb: 6 }}>
-            <McpPanel 
-              isAutoConfigured={mcpConfigured}
-              autoConfigError={mcpConfigError}
-            />
+            <Accordion 
+              expanded={mcpPanelExpanded} 
+              onChange={(_, isExpanded) => setMcpPanelExpanded(isExpanded)}
+              elevation={0}
+              sx={{
+                ...COMMON_STYLES.GLASS_MORPHISM,
+                borderRadius: APP_CONFIG.UI.CARD_BORDER_RADIUS,
+                overflow: 'hidden',
+                '&:before': {
+                  display: 'none',
+                },
+                '& .MuiAccordionSummary-root': {
+                  background: 'rgba(255, 255, 255, 0.9)',
+                  borderRadius: `${APP_CONFIG.UI.CARD_BORDER_RADIUS}px ${APP_CONFIG.UI.CARD_BORDER_RADIUS}px 0 0`,
+                  minHeight: 72,
+                  '&.Mui-expanded': {
+                    minHeight: 72,
+                  },
+                },
+                '& .MuiAccordionDetails-root': {
+                  padding: 0,
+                  background: 'transparent',
+                },
+              }}
+            >
+              <AccordionSummary
+                expandIcon={<ExpandMore />}
+                sx={{
+                  '& .MuiAccordionSummary-content': {
+                    alignItems: 'center',
+                    margin: '16px 0',
+                    '&.Mui-expanded': {
+                      margin: '16px 0',
+                    },
+                  },
+                }}
+              >
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                  <SmartToy 
+                    sx={{ 
+                      fontSize: 28, 
+                      mr: 2,
+                      color: portfolioTheme.portfolioColors.secondary.main 
+                    }} 
+                  />
+                  <Box>
+                    <Typography variant="h5" sx={{ fontWeight: 700, mb: 0.5 }}>
+                      MCP AI Tools
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      AI-powered portfolio analysis and recommendations
+                      {mcpConfigured && (
+                        <Typography component="span" color="success.main" sx={{ ml: 1, fontWeight: 600 }}>
+                          • Configured
+                        </Typography>
+                      )}
+                      {mcpConfigError && (
+                        <Typography component="span" color="error.main" sx={{ ml: 1, fontWeight: 600 }}>
+                          • Configuration Error
+                        </Typography>
+                      )}
+                    </Typography>
+                  </Box>
+                </Box>
+              </AccordionSummary>
+              <AccordionDetails>
+                <McpPanel 
+                  isAutoConfigured={mcpConfigured}
+                  autoConfigError={mcpConfigError}
+                />
+              </AccordionDetails>
+            </Accordion>
           </Box>
         </Fade>
 
