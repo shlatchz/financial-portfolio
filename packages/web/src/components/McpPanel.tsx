@@ -28,7 +28,6 @@ import {
   ContentCopy as ContentCopyIcon
 } from '@mui/icons-material';
 import { McpApiService, McpResponse } from '../services/mcpApiService';
-import { env } from '../config/env';
 
 interface McpPanelProps {
   isAutoConfigured?: boolean;
