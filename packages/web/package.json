@@ -1,0 +1,76 @@
+{
+  "name": "@portfolio/web",
+  "version": "1.0.0",
+  "description": "Modern web interface for portfolio management and analysis",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "vite --port 5173",
+    "build": "tsc && vite build",
+    "start": "vite preview --port 4173",
+    "clean": "rm -rf dist node_modules/.cache",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "lint:fix": "eslint . --ext ts,tsx --fix",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui"
+  },
+  "dependencies": {
+    "@portfolio/core": "file:../core",
+    "@tanstack/react-query": "^5.17.0",
+    "@mui/material": "^5.15.0",
+    "@mui/icons-material": "^5.15.0",
+    "@emotion/react": "^11.11.0",
+    "@emotion/styled": "^11.11.0",
+    "@mui/x-charts": "^6.18.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "recharts": "^2.10.3"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.43",
+    "@types/react-dom": "^18.2.17",
+    "@typescript-eslint/eslint-plugin": "^6.14.0",
+    "@typescript-eslint/parser": "^6.14.0",
+    "@vitejs/plugin-react": "^4.2.1",
+    "@vitest/ui": "^3.2.4",
+    "@testing-library/react": "^14.1.0",
+    "@testing-library/jest-dom": "^6.2.0",
+    "@testing-library/user-event": "^14.5.0",
+    "@playwright/test": "^1.40.0",
+    "@vitest/coverage-v8": "^3.2.4",
+    "eslint": "^8.55.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.5",
+    "jsdom": "^23.1.0",
+    "typescript": "^5.2.2",
+    "vite": "^7.0.0",
+    "vitest": "^3.2.4"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "author": "Rony Fragin",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/shlatchz/financial-portfolio.git",
+    "directory": "packages/web"
+  },
+  "homepage": "https://github.com/shlatchz/financial-portfolio#readme",
+  "bugs": {
+    "url": "https://github.com/shlatchz/financial-portfolio/issues"
+  },
+  "keywords": [
+    "portfolio",
+    "finance",
+    "investment",
+    "react",
+    "typescript",
+    "material-ui",
+    "web-app"
+  ]
+}

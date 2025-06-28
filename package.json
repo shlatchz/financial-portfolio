@@ -1,74 +1,71 @@
 {
-  "name": "portfolio-manager",
+  "name": "financial-portfolio-monorepo",
   "version": "1.0.0",
-  "description": "A modern React investment portfolio management system with real-time market data integration, advanced analytics, and intelligent rebalancing recommendations.",
+  "description": "A comprehensive financial portfolio management system with web interface and MCP server",
   "type": "module",
-  "author": {
-    "name": "Rony Fragin",
-    "email": "shlatchz@gmail.com"
-  },
-  "license": "MIT",
-  "keywords": [
-    "portfolio",
-    "investment",
-    "finance",
-    "react",
-    "typescript",
-    "material-ui",
-    "tase",
-    "stocks",
-    "bonds",
-    "rebalancing",
-    "analytics",
-    "dashboard"
+  "private": true,
+  "workspaces": [
+    "packages/*"
   ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/ronyfragin/portfolio-manager.git"
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "build:netlify": "npm run build --workspace=@portfolio/core && npm run build --workspace=@portfolio/web && npm run build:all --workspace=@portfolio/mcp",
+    "build:sequential": "cd packages/core && npm run build && cd ../web && npm run build && cd ../mcp && npm run build:all",
+    "build:ci": "npm install --workspaces && npm run build --workspace=@portfolio/core && npm run build --workspace=@portfolio/web && npm run build:all --workspace=@portfolio/mcp",
+    "dev": "npm run dev --workspace=packages/web",
+    "dev:mcp": "npm run dev --workspace=packages/mcp",
+    "start": "npm run start --workspace=packages/web",
+    "start:mcp": "npm run start --workspace=packages/mcp",
+    "lint": "npm run lint --workspaces --if-present",
+    "lint:fix": "npm run lint:fix --workspaces --if-present",
+    "clean": "npm run clean --workspaces --if-present",
+    "type-check": "npm run build:ci",
+    "test": "npm run test:core && npm run test:mcp && npm run test:web",
+    "test:core": "cd packages/core && npm test",
+    "test:mcp": "cd packages/mcp && npm test",
+    "test:web": "cd packages/web && npm test",
+    "test:ci": "npm run lint && npm run type-check",
+    "test:mcp:local": "node test-netlify-mcp.js",
+    "test:netlify": "node test-netlify-mcp.js",
+    "verify:deployment": "npm run build:netlify && npm run test:mcp"
   },
-  "bugs": {
-    "url": "https://github.com/ronyfragin/portfolio-manager/issues"
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.2.0",
+    "@testing-library/react": "^14.1.0",
+    "@testing-library/user-event": "^14.5.0",
+    "@vitest/coverage-v8": "^3.2.4",
+    "@vitest/ui": "^3.2.4",
+    "jsdom": "^23.1.0",
+    "vitest": "^3.2.4"
   },
-  "homepage": "https://github.com/ronyfragin/portfolio-manager#readme",
   "engines": {
     "node": ">=18.0.0",
     "npm": ">=8.0.0"
   },
-  "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 5",
-    "lint:fix": "eslint . --ext ts,tsx --fix",
-    "type-check": "tsc --noEmit",
-    "clean": "rm -rf dist node_modules/.vite",
-    "setup-env": "./setup-env.sh",
-    "start": "npm run dev",
-    "test": "echo \"No tests yet\" && exit 0"
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/sponsors/ronyf"
   },
-  "dependencies": {
-    "@emotion/react": "^11.11.1",
-    "@emotion/styled": "^11.11.0",
-    "@mui/icons-material": "^5.15.0",
-    "@mui/material": "^5.15.0",
-    "@mui/x-charts": "^6.18.0",
-    "@tanstack/react-query": "^5.17.0",
-    "axios": "^1.6.2",
-    "decimal.js": "^10.5.0",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/shlatchz/financial-portfolio.git"
   },
-  "devDependencies": {
-    "@types/decimal.js": "^7.4.3",
-    "@types/react": "^18.2.45",
-    "@types/react-dom": "^18.2.18",
-    "@typescript-eslint/eslint-plugin": "^6.21.0",
-    "@typescript-eslint/parser": "^6.21.0",
-    "@vitejs/plugin-react": "^4.2.1",
-    "eslint": "^8.55.0",
-    "eslint-plugin-react-hooks": "^4.6.0",
-    "eslint-plugin-react-refresh": "^0.4.5",
-    "typescript": "^5.3.3",
-    "vite": "^5.0.8"
+  "keywords": [
+    "portfolio",
+    "finance",
+    "investment",
+    "analysis",
+    "mcp",
+    "ai-integration",
+    "tase",
+    "israeli-market",
+    "monorepo",
+    "typescript"
+  ],
+  "author": "Rony Fragin",
+  "license": "MIT",
+  "homepage": "https://github.com/shlatchz/financial-portfolio#readme",
+  "bugs": {
+    "url": "https://github.com/shlatchz/financial-portfolio/issues"
   }
 }

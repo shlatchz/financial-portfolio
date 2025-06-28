@@ -1,0 +1,23 @@
+{
+  "mcpServers": {
+    "financial-portfolio": {
+      "command": "node",
+      "args": [
+        "/path/to/your/project/packages/mcp/dist/index.js"
+      ],
+      "env": {
+        "NODE_ENV": "production"
+      }
+    },
+    "financial-portfolio-netlify-bridge": {
+      "command": "node",
+      "args": [
+        "/path/to/your/project/packages/mcp/dist/netlify-bridge.js"
+      ],
+      "env": {
+        "NODE_ENV": "production",
+        "NETLIFY_MCP_URL": "https://your-site.netlify.app/api/mcp"
+      }
+    }
+  }
+}

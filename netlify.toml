@@ -1,0 +1,28 @@
+[build]
+  base = "."
+  command = "npm run build:ci"
+  publish = "packages/web/dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+[functions]
+  directory = "netlify/functions"
+
+# Redirect all API calls to Netlify Functions in production  
+[[redirects]]
+  from = "/api/mcp"
+  to = "/.netlify/functions/mcp-api"
+  status = 200
+
+# MCP API endpoint
+[[redirects]]
+  from = "/api/maya/*"
+  to = "/.netlify/functions/maya-proxy/:splat"
+  status = 200
+
+# SPA fallback - serve index.html for all routes
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200 
