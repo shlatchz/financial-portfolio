@@ -75,6 +75,7 @@ const PortfolioApp: React.FC = () => {
       // Also auto-configure MCP service
       configureMcpService(env.defaultSpreadsheetUrl, env.defaultGoogleSheetsApiKey);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const { data: portfolioSummary, isLoading, error, refetch } = usePortfolioData({
