@@ -147,7 +147,7 @@ const McpPanel: React.FC<McpPanelProps> = ({ isAutoConfigured = false, autoConfi
           
           {result.result && (
             <Box>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, paddingX: 2 }}>
                 <Typography variant="h6" color="success.main">
                   Response:
                 </Typography>
@@ -162,17 +162,31 @@ const McpPanel: React.FC<McpPanelProps> = ({ isAutoConfigured = false, autoConfi
               <Paper 
                 variant="outlined" 
                 sx={{ 
-                  p: 2, 
+                  m: 2,
                   bgcolor: 'grey.50',
                   maxHeight: 300,
-                  overflow: 'auto',
-                  fontFamily: 'monospace',
-                  whiteSpace: 'pre-wrap'
+                  overflow: 'auto'
                 }}
               >
-                <Typography variant="body2">
-                  {mcpService.extractTextContent(result.result)}
-                </Typography>
+                <Box 
+                  sx={{ 
+                    padding: '24px',
+                    fontFamily: 'monospace',
+                    whiteSpace: 'pre-wrap'
+                  }}
+                >
+                  <Typography 
+                    variant="body2" 
+                    component="div"
+                    sx={{ 
+                      lineHeight: 1.6,
+                      margin: 0,
+                      fontFamily: 'inherit'
+                    }}
+                  >
+                    {mcpService.extractTextContent(result.result)}
+                  </Typography>
+                </Box>
               </Paper>
             </Box>
           )}
