@@ -81,7 +81,7 @@ export class PortfolioMcpService {
 
     const summary = this.analyzer.analyzePortfolio(portfolioActions, securitiesInfo);
 
-    const formatCurrency = (amount) => `$${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    const formatCurrency = (amount) => `${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}₪`;
     const formatPercentage = (decimal) => `${(decimal * 100).toFixed(1)}%`;
 
     return {
@@ -161,7 +161,7 @@ ${summary.securities.map(s => `- ${s.name} (${s.id}): ${s.currentAmount.toLocale
     const summary = this.analyzer.analyzePortfolio(portfolioActions, securitiesInfo);
     const rebalanceResult = this.analyzer.calculateRebalance(summary, additionalInvestment);
 
-    const formatCurrency = (amount) => `$${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    const formatCurrency = (amount) => `${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}₪`;
     const formatPercentage = (decimal) => `${(decimal * 100).toFixed(1)}%`;
 
     let advice = `💡 Financial Advice & Rebalancing Recommendations:
@@ -214,7 +214,7 @@ ${summary.securities.map(s => `- ${s.name} (${s.id}): ${s.currentAmount.toLocale
 
     const summary = this.analyzer.analyzePortfolio(portfolioActions, securitiesInfo);
 
-    const formatCurrency = (amount) => `$${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    const formatCurrency = (amount) => `${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}₪`;
     const formatPercentage = (decimal) => `${(decimal * 100).toFixed(2)}%`;
 
     return {
