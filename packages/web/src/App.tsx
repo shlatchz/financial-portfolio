@@ -40,6 +40,27 @@ const PortfolioApp: React.FC = () => {
   const queryClientInstance = useQueryClient();
   const mcpService = new McpApiService();
 
+  // Helper function to configure MCP service
+  const configureMcpService = async (url: string, key: string) => {
+    try {
+      setMcpConfigError(null);
+      const spreadsheetId = GoogleSheetsService.extractSpreadsheetId(url);
+      if (spreadsheetId) {
+        await mcpService.configurePortfolio({
+          googleSheetsApiKey: key,
+          spreadsheetId: spreadsheetId,
+          targetBondPercentage: env.fundsTypeDistributionBond,
+          targetSharePercentage: env.fundsTypeDistributionShare,
+          customSecurities: env.customSecurities
+        });
+        setMcpConfigured(true);
+      }
+    } catch (error) {
+      console.warn('MCP configuration failed (this is optional):', error);
+      setMcpConfigError(error instanceof Error ? error.message : 'Failed to configure MCP service');
+    }
+  };
+
   useEffect(() => {
     const isValid = validateEnv();
     setEnvValid(isValid);
@@ -50,6 +71,9 @@ const PortfolioApp: React.FC = () => {
       setSpreadsheetUrl(env.defaultSpreadsheetUrl);
       setApiKey(env.defaultGoogleSheetsApiKey);
       setShouldAnalyze(true);
+      
+      // Also auto-configure MCP service
+      configureMcpService(env.defaultSpreadsheetUrl, env.defaultGoogleSheetsApiKey);
     }
   }, []);
 
@@ -80,23 +104,7 @@ const PortfolioApp: React.FC = () => {
     }
     
     // Also configure MCP service automatically
-    try {
-      setMcpConfigError(null);
-      const spreadsheetId = GoogleSheetsService.extractSpreadsheetId(url);
-      if (spreadsheetId) {
-        await mcpService.configurePortfolio({
-          googleSheetsApiKey: key,
-          spreadsheetId: spreadsheetId,
-          targetBondPercentage: env.fundsTypeDistributionBond,
-          targetSharePercentage: env.fundsTypeDistributionShare,
-          customSecurities: env.customSecurities
-        });
-        setMcpConfigured(true);
-      }
-    } catch (error) {
-      console.warn('MCP configuration failed (this is optional):', error);
-      setMcpConfigError(error instanceof Error ? error.message : 'Failed to configure MCP service');
-    }
+    await configureMcpService(url, key);
   };
 
   const renderContent = () => {
