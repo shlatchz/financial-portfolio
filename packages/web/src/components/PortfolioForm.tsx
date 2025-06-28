@@ -120,7 +120,7 @@ const PortfolioForm: React.FC<PortfolioFormProps> = ({ onAnalyze, isLoading = fa
               Portfolio Data Source
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Connect your Google Sheets portfolio for analysis
+              Connect your Google Sheets portfolio for analysis and auto-configure AI tools
             </Typography>
           </Box>
         </Box>
@@ -225,7 +225,7 @@ const PortfolioForm: React.FC<PortfolioFormProps> = ({ onAnalyze, isLoading = fa
                 },
               }}
             >
-              {isLoading ? 'Analyzing...' : 'Analyze Portfolio'}
+              {isLoading ? 'Analyzing...' : 'Analyze Portfolio & Configure AI Tools'}
             </Button>
           </Stack>
 

@@ -13,6 +13,8 @@ import McpPanel from './components/McpPanel';
 import { usePortfolioData } from './hooks/usePortfolioData';
 import { env, validateEnv, getEnvInfo } from './config/env';
 import { APP_CONFIG, COMMON_STYLES } from './config/constants';
+import { McpApiService } from './services/mcpApiService';
+import { GoogleSheetsService } from '@portfolio/core';
 
 // Create a client with environment-based configuration
 const queryClient = new QueryClient({
@@ -32,8 +34,11 @@ const PortfolioApp: React.FC = () => {
   const [isReanalyzing, setIsReanalyzing] = useState(false);
   const [envValid, setEnvValid] = useState(true);
   const [envInfo, setEnvInfo] = useState<ReturnType<typeof getEnvInfo> | null>(null);
+  const [mcpConfigured, setMcpConfigured] = useState(false);
+  const [mcpConfigError, setMcpConfigError] = useState<string | null>(null);
   
   const queryClientInstance = useQueryClient();
+  const mcpService = new McpApiService();
 
   useEffect(() => {
     const isValid = validateEnv();
@@ -72,6 +77,25 @@ const PortfolioApp: React.FC = () => {
       setSpreadsheetUrl(url);
       setApiKey(key);
       setShouldAnalyze(true);
+    }
+    
+    // Also configure MCP service automatically
+    try {
+      setMcpConfigError(null);
+      const spreadsheetId = GoogleSheetsService.extractSpreadsheetId(url);
+      if (spreadsheetId) {
+        await mcpService.configurePortfolio({
+          googleSheetsApiKey: key,
+          spreadsheetId: spreadsheetId,
+          targetBondPercentage: env.fundsTypeDistributionBond,
+          targetSharePercentage: env.fundsTypeDistributionShare,
+          customSecurities: env.customSecurities
+        });
+        setMcpConfigured(true);
+      }
+    } catch (error) {
+      console.warn('MCP configuration failed (this is optional):', error);
+      setMcpConfigError(error instanceof Error ? error.message : 'Failed to configure MCP service');
     }
   };
 
@@ -361,6 +385,8 @@ const PortfolioApp: React.FC = () => {
             <McpPanel 
               googleSheetsApiKey={apiKey} 
               spreadsheetId={spreadsheetUrl ? spreadsheetUrl.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/)?.[1] : undefined}
+              isAutoConfigured={mcpConfigured}
+              autoConfigError={mcpConfigError}
             />
           </Box>
         </Fade>

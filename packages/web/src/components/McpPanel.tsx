@@ -34,6 +34,8 @@ import { env } from '../config/env';
 interface McpPanelProps {
   googleSheetsApiKey?: string;
   spreadsheetId?: string;
+  isAutoConfigured?: boolean;
+  autoConfigError?: string | null;
 }
 
 interface ToolResult {
@@ -43,9 +45,9 @@ interface ToolResult {
   error?: string;
 }
 
-const McpPanel: React.FC<McpPanelProps> = ({ googleSheetsApiKey, spreadsheetId }) => {
+const McpPanel: React.FC<McpPanelProps> = ({ googleSheetsApiKey, spreadsheetId, isAutoConfigured = false, autoConfigError }) => {
   const [mcpService] = useState(() => new McpApiService());
-  const [isConfigured, setIsConfigured] = useState(false);
+  const [isConfigured, setIsConfigured] = useState(isAutoConfigured);
   const [toolResults, setToolResults] = useState<Record<string, ToolResult>>({});
   const [formData, setFormData] = useState({
     apiKey: googleSheetsApiKey || '',
@@ -69,6 +71,11 @@ const McpPanel: React.FC<McpPanelProps> = ({ googleSheetsApiKey, spreadsheetId }
     if (googleSheetsApiKey) setFormData(prev => ({ ...prev, apiKey: googleSheetsApiKey }));
     if (spreadsheetId) setFormData(prev => ({ ...prev, spreadsheet: spreadsheetId }));
   }, [googleSheetsApiKey, spreadsheetId]);
+
+  // Update configuration status when auto-configured
+  useEffect(() => {
+    setIsConfigured(isAutoConfigured);
+  }, [isAutoConfigured]);
 
   const checkMcpAvailability = async () => {
     try {
@@ -263,63 +270,97 @@ const McpPanel: React.FC<McpPanelProps> = ({ googleSheetsApiKey, spreadsheetId }
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
             <SettingsIcon color="primary" />
             <Typography variant="h6">Portfolio Configuration</Typography>
-            {isConfigured && <Chip label="Configured" color="success" size="small" />}
+            {isConfigured && <Chip label={isAutoConfigured ? "Auto-Configured" : "Configured"} color="success" size="small" />}
           </Box>
           
-          <Grid container spacing={2}>
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label="Google Sheets API Key"
-                type="password"
-                value={formData.apiKey}
-                onChange={(e) => setFormData(prev => ({ ...prev, apiKey: e.target.value }))}
-                size="small"
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label="Spreadsheet ID"
-                value={formData.spreadsheet}
-                onChange={(e) => setFormData(prev => ({ ...prev, spreadsheet: e.target.value }))}
-                size="small"
-              />
-            </Grid>
-            <Grid item xs={6} md={3}>
-              <TextField
-                fullWidth
-                label="Target Bonds %"
-                type="number"
-                inputProps={{ step: 0.01, min: 0, max: 1 }}
-                value={formData.targetBonds}
-                onChange={(e) => setFormData(prev => ({ ...prev, targetBonds: parseFloat(e.target.value) }))}
-                size="small"
-              />
-            </Grid>
-            <Grid item xs={6} md={3}>
-              <TextField
-                fullWidth
-                label="Target Shares %"
-                type="number"
-                inputProps={{ step: 0.01, min: 0, max: 1 }}
-                value={formData.targetShares}
-                onChange={(e) => setFormData(prev => ({ ...prev, targetShares: parseFloat(e.target.value) }))}
-                size="small"
-              />
-            </Grid>
-          </Grid>
+          {isAutoConfigured ? (
+            <Box>
+              <Alert severity="success" sx={{ mb: 2 }}>
+                <Typography variant="body2">
+                  🎉 MCP tools are automatically configured when you analyze your portfolio above!
+                </Typography>
+              </Alert>
+              <Typography variant="body2" color="text.secondary">
+                Configuration details:
+              </Typography>
+              <Box sx={{ mt: 1, pl: 2 }}>
+                <Typography variant="body2">• Spreadsheet: {formData.spreadsheet || 'Not set'}</Typography>
+                <Typography variant="body2">• Target Allocation: {(formData.targetBonds * 100).toFixed(1)}% bonds, {(formData.targetShares * 100).toFixed(1)}% shares</Typography>
+                <Typography variant="body2">• Custom Securities: {env.customSecurities.length} configured</Typography>
+              </Box>
+              {autoConfigError && (
+                <Alert severity="warning" sx={{ mt: 2 }}>
+                  <Typography variant="body2">
+                    Auto-configuration had an issue: {autoConfigError}
+                  </Typography>
+                </Alert>
+              )}
+            </Box>
+          ) : (
+            <Box>
+              <Alert severity="info" sx={{ mb: 2 }}>
+                <Typography variant="body2">
+                  💡 Use "Analyze Portfolio" above to automatically configure MCP tools, or manually configure below.
+                </Typography>
+              </Alert>
+              <Grid container spacing={2}>
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    fullWidth
+                    label="Google Sheets API Key"
+                    type="password"
+                    value={formData.apiKey}
+                    onChange={(e) => setFormData(prev => ({ ...prev, apiKey: e.target.value }))}
+                    size="small"
+                  />
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    fullWidth
+                    label="Spreadsheet ID"
+                    value={formData.spreadsheet}
+                    onChange={(e) => setFormData(prev => ({ ...prev, spreadsheet: e.target.value }))}
+                    size="small"
+                  />
+                </Grid>
+                <Grid item xs={6} md={3}>
+                  <TextField
+                    fullWidth
+                    label="Target Bonds %"
+                    type="number"
+                    inputProps={{ step: 0.01, min: 0, max: 1 }}
+                    value={formData.targetBonds}
+                    onChange={(e) => setFormData(prev => ({ ...prev, targetBonds: parseFloat(e.target.value) }))}
+                    size="small"
+                  />
+                </Grid>
+                <Grid item xs={6} md={3}>
+                  <TextField
+                    fullWidth
+                    label="Target Shares %"
+                    type="number"
+                    inputProps={{ step: 0.01, min: 0, max: 1 }}
+                    value={formData.targetShares}
+                    onChange={(e) => setFormData(prev => ({ ...prev, targetShares: parseFloat(e.target.value) }))}
+                    size="small"
+                  />
+                </Grid>
+              </Grid>
+            </Box>
+          )}
         </CardContent>
-        <CardActions>
-          <Button
-            variant="contained"
-            onClick={configurePortfolio}
-            disabled={!formData.apiKey || !formData.spreadsheet || toolResults.configure_portfolio?.loading}
-            startIcon={toolResults.configure_portfolio?.loading ? <CircularProgress size={16} /> : <SettingsIcon />}
-          >
-            Configure Portfolio
-          </Button>
-        </CardActions>
+        {!isAutoConfigured && (
+          <CardActions>
+            <Button
+              variant="contained"
+              onClick={configurePortfolio}
+              disabled={!formData.apiKey || !formData.spreadsheet || toolResults.configure_portfolio?.loading}
+              startIcon={toolResults.configure_portfolio?.loading ? <CircularProgress size={16} /> : <SettingsIcon />}
+            >
+              Configure Portfolio
+            </Button>
+          </CardActions>
+        )}
       </Card>
 
       {/* MCP Tools Grid */}
