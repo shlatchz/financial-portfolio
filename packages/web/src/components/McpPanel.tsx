@@ -11,7 +11,6 @@ import {
   AccordionSummary,
   AccordionDetails,
   Chip,
-  Divider,
   Grid,
   IconButton,
   Card,
@@ -223,25 +222,7 @@ const McpPanel: React.FC<McpPanelProps> = ({ isAutoConfigured = false, autoConfi
   }
 
   return (
-    <Paper sx={{ p: 3 }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
-        <PsychologyIcon color="primary" fontSize="large" />
-        <Box>
-          <Typography variant="h5" fontWeight="bold">
-            MCP AI Tools
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Interactive Model Context Protocol tools for portfolio analysis
-          </Typography>
-        </Box>
-        <Chip 
-          label={env.isDevelopment ? 'Development' : 'Production'} 
-          color={env.isDevelopment ? 'warning' : 'success'} 
-          size="small" 
-        />
-      </Box>
-
-      <Divider sx={{ mb: 3 }} />
+    <Box sx={{ p: 3 }}>
 
       {/* Configuration Status */}
       {isConfigured && (
@@ -419,7 +400,7 @@ const McpPanel: React.FC<McpPanelProps> = ({ isAutoConfigured = false, autoConfi
           {Object.keys(toolResults).map(toolName => renderToolResult(toolName))}
         </Box>
       )}
-    </Paper>
+    </Box>
   );
 };
 
