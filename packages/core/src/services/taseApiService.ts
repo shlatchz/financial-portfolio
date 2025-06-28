@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { SecurityInfo } from '../types/index';
 import { APP_CONFIG } from '../config/constants';
+import { NETLIFY_FUNCTIONS, API_HEADERS, API_PATHS } from '../config/api-constants';
 
 /**
  * Service for fetching security data from Tel Aviv Stock Exchange Maya API
@@ -8,7 +9,7 @@ import { APP_CONFIG } from '../config/constants';
 export class TaseApiService {
   private readonly baseUrl: string;
 
-  constructor(baseUrl: string = '/.netlify/functions/maya-proxy') {
+  constructor(baseUrl: string = NETLIFY_FUNCTIONS.PRODUCTION.MAYA_PROXY) {
     this.baseUrl = baseUrl;
   }
 
@@ -43,11 +44,11 @@ export class TaseApiService {
   private async getMutualFundDetails(fundId: string): Promise<SecurityInfo | null> {
     try {
       const headers: Record<string, string> = {
-        'Accept': 'application/json, text/plain, */*',
-        'Accept-Language': 'he-IL'
+        'Accept': API_HEADERS.TASE.ACCEPT,
+        'Accept-Language': API_HEADERS.TASE.ACCEPT_LANGUAGE
       };
 
-      const url = `${this.baseUrl}/mutual/${fundId}`;
+      const url = `${this.baseUrl}${API_PATHS.TASE.MUTUAL_FUND(fundId)}`;
         
       const response = await axios.get(url, {
         headers,
@@ -80,11 +81,11 @@ export class TaseApiService {
   private async getSecurityDetails(fundId: string): Promise<SecurityInfo | null> {
     try {
       const headers: Record<string, string> = {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
+        'Accept': API_HEADERS.COMMON.ACCEPT,
+        'Content-Type': API_HEADERS.COMMON.CONTENT_TYPE
       };
 
-      const url = `${this.baseUrl}/etf/${fundId}`;
+      const url = `${this.baseUrl}${API_PATHS.TASE.ETF(fundId)}`;
         
       const response = await axios.get(url, {
         headers,

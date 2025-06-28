@@ -1,9 +1,6 @@
 /// <reference types="vitest" />
-import { defineConfig } from 'vitest/config';
+import { createVitestConfig, nodeEnvironmentConfig } from '../../vitest.config.shared';
 
-export default defineConfig({
-  test: {
-    globals: true,
-    environment: 'node',
-  },
+export default createVitestConfig({
+  ...nodeEnvironmentConfig
 }); 

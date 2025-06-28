@@ -1,15 +1,11 @@
 /// <reference types="vitest" />
-import { defineConfig } from 'vitest/config';
+import { createVitestConfig, reactEnvironmentConfig } from '../../vitest.config.shared';
 import react from '@vitejs/plugin-react';
 
-export default defineConfig({
+export default createVitestConfig({
   plugins: [react()],
   test: {
-    globals: true,
-    environment: 'jsdom',
-    setupFiles: './src/test/setup.ts',
-    include: ['src/**/*.{test,spec}.{js,jsx,ts,tsx}'],
-    exclude: ['node_modules', 'dist'],
+    ...reactEnvironmentConfig.test,
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
@@ -18,7 +14,7 @@ export default defineConfig({
         'dist/',
         '**/*.d.ts',
         '**/*.config.*',
-        'src/test/**'
+        'src/test/**' // Web-specific exclusion for test utilities
       ]
     }
   },

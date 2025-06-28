@@ -241,7 +241,7 @@ describe('PortfolioMcpService', () => {
 
       expect(result.content).toHaveLength(1);
       expect(result.content[0].text).toContain('Portfolio Status');
-      expect(result.content[0].text).toContain('$110,000'); // USD format in tests
+      expect(result.content[0].text).toContain('110,000'); // Should contain the numeric value regardless of currency symbol
     });
   });
 

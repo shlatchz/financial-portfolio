@@ -47,7 +47,7 @@ describe('Vite Config File Validation', () => {
     
     expect(configContent).toContain('server:');
     expect(configContent).toContain('port:');
-    expect(configContent).toContain(String(PORTS.viteDefault));
+    expect(configContent).toContain(String(PORTS.VITE_DEFAULT));
   });
 
   it('should be valid TypeScript syntax', () => {
@@ -97,7 +97,7 @@ describe('Vite Config File Validation', () => {
     const configContent = readViteConfig();
     
     // Both proxies should target localhost:8888
-    expect(configContent).toContain(`localhost:${PORTS.netlifyDev}`);
+    expect(configContent).toContain(`localhost:${PORTS.NETLIFY_DEV}`);
     expect(configContent).not.toContain('https://maya.tase.co.il');
     expect(configContent).not.toContain('https://mayaapi.tase.co.il');
   });

@@ -1,5 +1,6 @@
 // Shared mock data and response structures for tests
 
+import { expect } from 'vitest';
 import { TEST_DATA } from './constants';
 
 // Mock API Responses

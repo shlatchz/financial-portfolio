@@ -1,9 +1,10 @@
 // Environment configuration with validation
 
 import { APP_CONFIG } from './constants';
+import type { CustomSecurity } from '@portfolio/core';
+import { URL_BUILDERS } from '@portfolio/core';
 
-// Constants
-const TASE_BASE_URL = 'https://maya.tase.co.il';
+// Constants are now imported from @portfolio/core
 
 /**
  * Parses custom securities from environment variable
@@ -51,27 +52,15 @@ const createEmptyCustomSecurity = (index: number): CustomSecurity => ({
   date: new Date().toISOString().split('T')[0]
 });
 
-export interface CustomSecurity {
-  id: string;
-  bondPercentage: number;
-  sharePercentage: number;
-  value: number;
-  date: string;
-}
-
 export const env = {
   // Portfolio Data Source
   defaultGoogleSheetsApiKey: import.meta.env.VITE_DEFAULT_GOOGLE_SHEETS_API_KEY || '',
   
-  // TASE API (constant)
-  taseBaseUrl: TASE_BASE_URL,
+  // TASE API (constant) - now using shared constants
+  taseBaseUrl: URL_BUILDERS.getTaseApiUrl(import.meta.env.DEV),
   
-  // MCP API URL - auto-detect local vs deployed
-  mcpApiUrl: import.meta.env.VITE_MCP_API_URL || (
-    import.meta.env.DEV 
-      ? 'http://localhost:8888/api/mcp'  // Local Netlify dev
-      : '/api/mcp'  // Deployed Netlify function
-  ),
+  // MCP API URL - auto-detect local vs deployed using shared constants
+  mcpApiUrl: import.meta.env.VITE_MCP_API_URL || URL_BUILDERS.getMcpApiUrl(import.meta.env.DEV),
   
   // Fund Distribution
   fundsTypeDistributionBond: parseFloat(import.meta.env.VITE_FUNDS_TYPE_DISTRIBUTION_BOND || '0.2'),

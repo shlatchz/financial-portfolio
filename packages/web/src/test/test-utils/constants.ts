@@ -1,30 +1,35 @@
-// Shared constants for tests to eliminate duplication
+// Shared constants for tests - now using centralized API constants
 
-// API Endpoints
+import { 
+  VITE_PROXY_ROUTES, 
+  NETLIFY_FUNCTIONS, 
+  PORTS as SHARED_PORTS,
+  URL_VALIDATION 
+} from '@portfolio/core';
+
+// API Endpoints - using shared constants
 export const API_ENDPOINTS = {
   // Development endpoints (proxied)
   dev: {
-    mayaApi: '/api/maya',
-    mcpApi: '/api/mcp',
+    mayaApi: VITE_PROXY_ROUTES.MAYA_API,
+    mcpApi: VITE_PROXY_ROUTES.MCP_API,
   },
   // Production endpoints (direct)
   prod: {
-    mayaApi: '/.netlify/functions/maya-proxy',
-    mcpApi: '/api/mcp',
+    mayaApi: NETLIFY_FUNCTIONS.PRODUCTION.MAYA_PROXY,
+    mcpApi: NETLIFY_FUNCTIONS.PRODUCTION.MCP_API,
   },
   // Proxy targets
   targets: {
-    netlifyDev: 'http://localhost:8888',
-    mayaProxy: 'http://localhost:8888/.netlify/functions/maya-proxy',
+    netlifyDev: NETLIFY_FUNCTIONS.DEVELOPMENT.BASE_URL,
+    mayaProxy: NETLIFY_FUNCTIONS.DEVELOPMENT.MAYA_PROXY,
   }
 } as const;
 
-// Port Configuration
+// Port Configuration - extending shared ports with test-specific ones
 export const PORTS = {
-  netlifyDev: 8888,
-  viteDefault: 5173,
+  ...SHARED_PORTS,
   viteAlternate: 5174,  // When 5173 is taken
-  preview: 4173,
 } as const;
 
 // Proxy Configuration Template
@@ -107,7 +112,7 @@ export const ENVIRONMENT_CONFIGS = {
   development: {
     mayaApi: API_ENDPOINTS.dev.mayaApi,
     mcpApi: API_ENDPOINTS.dev.mcpApi,
-    netlifyDevPort: PORTS.netlifyDev,
+    netlifyDevPort: PORTS.NETLIFY_DEV,
     viteDevPort: PORTS.viteAlternate,
     proxyEnabled: true,
   },
@@ -147,12 +152,12 @@ export const REQUIRED_CONFIG_ELEMENTS = [
   'rewrite:'
 ] as const;
 
-// Validation Patterns
+// Validation Patterns - extending shared patterns with test-specific ones
 export const VALIDATION_PATTERNS = {
   fundIdPattern: /^\d+$/,
   devApiPattern: /^\/api/,
-  prodApiPattern: /^\/\.netlify\/functions/,
-  localhostPattern: /^http:\/\/localhost:8888/,
-  mayaProxyPattern: /^http:\/\/localhost:8888/,
-  mcpProxyPattern: /^http:\/\/localhost:8888$/,
+  prodApiPattern: URL_VALIDATION.PATTERNS.NETLIFY_FUNCTION,
+  localhostPattern: URL_VALIDATION.PATTERNS.LOCALHOST,
+  mayaProxyPattern: URL_VALIDATION.PATTERNS.LOCALHOST,
+  mcpProxyPattern: URL_VALIDATION.PATTERNS.LOCALHOST,
 } as const; 

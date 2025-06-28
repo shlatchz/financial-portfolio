@@ -1,5 +1,6 @@
 import { PortfolioAction } from '../types/index';
 import { APP_CONFIG } from '../config/constants';
+import { EXTERNAL_APIS, URL_BUILDERS } from '../config/api-constants';
 
 const AGOROT_TO_ILS = 100;
 const DEFAULT_RANGE = 'A:F';
@@ -9,7 +10,7 @@ const DEFAULT_RANGE = 'A:F';
  */
 export class GoogleSheetsService {
   private readonly apiKey: string;
-  private readonly baseUrl = 'https://sheets.googleapis.com/v4/spreadsheets';
+  private readonly baseUrl = EXTERNAL_APIS.GOOGLE_SHEETS.BASE_URL;
 
   constructor(apiKey?: string) {
     this.apiKey = apiKey || '';
@@ -36,7 +37,7 @@ export class GoogleSheetsService {
         finalRange = `${sheetNames[0]}!${DEFAULT_RANGE}`;
       }
 
-      const url = `${this.baseUrl}/${spreadsheetId}/values/${encodeURIComponent(finalRange)}?key=${this.apiKey}`;
+      const url = URL_BUILDERS.buildSheetsUrl(spreadsheetId, finalRange, this.apiKey);
       const response = await fetch(url, { 
         signal: AbortSignal.timeout(APP_CONFIG.API.TIMEOUT)
       });
@@ -143,7 +144,7 @@ export class GoogleSheetsService {
       }
 
       const firstSheetRange = `${sheetNames[0]}!A1:F10`;
-      const url = `${this.baseUrl}/${spreadsheetId}/values/${encodeURIComponent(firstSheetRange)}?key=${this.apiKey}`;
+      const url = URL_BUILDERS.buildSheetsUrl(spreadsheetId, firstSheetRange, this.apiKey);
       
       const response = await fetch(url, { 
         signal: AbortSignal.timeout(APP_CONFIG.API.TIMEOUT)

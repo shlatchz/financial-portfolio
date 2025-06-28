@@ -1,12 +1,11 @@
 /// <reference types="vitest" />
-import { defineConfig } from 'vitest/config';
+import { createVitestConfig, nodeEnvironmentConfig } from '../../vitest.config.shared';
 
-export default defineConfig({
+export default createVitestConfig({
+  ...nodeEnvironmentConfig,
   test: {
-    globals: true,
-    environment: 'node',
-    include: ['src/**/*.{test,spec}.{js,ts}'],
-    exclude: ['node_modules', 'dist'],
+    ...nodeEnvironmentConfig.test,
+    include: ['src/**/*.{test,spec}.{js,ts}'], // Node-specific file extensions
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
@@ -15,7 +14,7 @@ export default defineConfig({
         'dist/',
         '**/*.d.ts',
         '**/*.config.*',
-        '**/fix-extensions.js'
+        '**/fix-extensions.js' // Core-specific exclusion
       ]
     }
   }

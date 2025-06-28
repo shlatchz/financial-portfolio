@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { PortfolioSummary, SecurityInfo, GoogleSheetsService, TaseApiService, PortfolioAnalyzer, PortfolioAction } from '@portfolio/core';
+import { PortfolioSummary, SecurityInfo, GoogleSheetsService, TaseApiService, PortfolioAnalyzer, PortfolioAction, URL_BUILDERS } from '@portfolio/core';
 import { env } from '../config/env';
 
 interface UsePortfolioDataProps {
@@ -33,8 +33,8 @@ export const usePortfolioData = ({ spreadsheetUrl, apiKey, enabled = true }: Use
       }
 
       const sheetsService = new GoogleSheetsService(apiKey);
-      // Use Vite proxy in development, Netlify function in production
-      const taseBaseUrl = import.meta.env.DEV ? '/api/maya' : '/.netlify/functions/maya-proxy';
+      // Use shared URL builder for environment-specific URLs
+      const taseBaseUrl = URL_BUILDERS.getTaseApiUrl(import.meta.env.DEV);
       const taseService = new TaseApiService(taseBaseUrl);
       const targetDistribution = {
         bond: env.fundsTypeDistributionBond,
