@@ -377,17 +377,17 @@ const PortfolioApp: React.FC = () => {
           </Box>
         </Grow>
 
-        {renderContent()}
-
         {/* MCP AI Tools Panel */}
-        <Fade in timeout={APP_CONFIG.ANIMATION.NORMAL} style={{ transitionDelay: '600ms' }}>
-          <Box sx={{ mt: 6 }}>
+        <Fade in timeout={APP_CONFIG.ANIMATION.NORMAL} style={{ transitionDelay: '350ms' }}>
+          <Box sx={{ mb: 6 }}>
             <McpPanel 
               isAutoConfigured={mcpConfigured}
               autoConfigError={mcpConfigError}
             />
           </Box>
         </Fade>
+
+        {renderContent()}
       </Container>
     </Box>
   );
