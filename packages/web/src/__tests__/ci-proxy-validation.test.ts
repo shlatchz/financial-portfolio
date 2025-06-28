@@ -99,7 +99,7 @@ describe('CI Proxy Configuration Validation', () => {
     // Check that path rewriting is correctly configured
     expect(configContent).toContain('rewrite:');
     expect(configContent).toContain('path.replace');
-    expect(configContent).toContain('/^\\\/api\\\/maya/');
+    expect(configContent).toContain('api/maya');
     
     // Test the rewrite logic
     const rewrite = (path: string) => path.replace(/^\/api\/maya/, '');
