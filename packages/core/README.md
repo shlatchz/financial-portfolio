@@ -234,6 +234,6 @@ MIT - See [LICENSE](../../LICENSE) file for details.
 
 ## 🆘 Support
 
-- **Issues**: [GitHub Issues](https://github.com/your-org/financial-portfolio-monorepo/issues)
+- **Issues**: [GitHub Issues](https://github.com/shlatchz/financial-portfolio/issues)
 - **Documentation**: [Main README](../../README.md)
 - **Examples**: See [web](../web) and [mcp](../mcp) packages for usage examples 

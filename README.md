@@ -344,16 +344,13 @@ financial-portfolio/
 ├── netlify/
 │   └── functions/            # Netlify serverless functions
 │
-├── .github/
-│   └── workflows/            # CI/CD pipelines
-│
-└── docs/                     # Documentation
+└── .github/
+    └── workflows/            # CI/CD pipelines
 ```
 
 ## 📚 Documentation
 
-- [Setup Guide](setup.md) - Detailed setup instructions
-- [Environment Guide](ENV_GUIDE.md) - Environment variable configuration
+- [Environment Setup Guide](ENV_GUIDE.md) - Detailed setup and environment variable configuration
 - [MCP Usage Examples](packages/mcp/USAGE_EXAMPLES.md) - MCP server usage
 - [Netlify Deployment](NETLIFY_DEPLOYMENT.md) - Deployment guide
 - [Contributing](CONTRIBUTING.md) - Contribution guidelines

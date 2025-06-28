@@ -327,7 +327,7 @@ MIT - See [LICENSE](../../LICENSE) file for details.
 
 - **Documentation**: [Main README](../../README.md) and [Environment Guide](../../ENV_GUIDE.md)
 - **Core Library**: [Core Package README](../core/README.md)
-- **Issues**: [GitHub Issues](https://github.com/your-org/financial-portfolio-monorepo/issues)
+- **Issues**: [GitHub Issues](https://github.com/shlatchz/financial-portfolio/issues)
 - **Live Demo**: [View Demo](https://financial-portfolio-shlatchz.netlify.app/)
 
 ## Testing
