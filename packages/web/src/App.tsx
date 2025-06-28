@@ -39,7 +39,7 @@ const PortfolioApp: React.FC = () => {
   const [envInfo, setEnvInfo] = useState<ReturnType<typeof getEnvInfo> | null>(null);
   const [mcpConfigured, setMcpConfigured] = useState(false);
   const [mcpConfigError, setMcpConfigError] = useState<string | null>(null);
-  const [portfolioFormExpanded, setPortfolioFormExpanded] = useState(true);
+  const [portfolioFormExpanded, setPortfolioFormExpanded] = useState(false);
   const [mcpPanelExpanded, setMcpPanelExpanded] = useState(false);
   
   const queryClientInstance = useQueryClient();
@@ -80,6 +80,8 @@ const PortfolioApp: React.FC = () => {
       // Also auto-configure MCP service with default distribution
       configureMcpService(env.defaultSpreadsheetUrl, env.defaultGoogleSheetsApiKey, env.fundsTypeDistributionBond, env.fundsTypeDistributionShare, env.customSecurities);
       
+      // Expand Portfolio form to show the auto-configured settings
+      setPortfolioFormExpanded(true);
       // Expand MCP panel when auto-start is enabled
       setMcpPanelExpanded(true);
     }
@@ -121,7 +123,8 @@ const PortfolioApp: React.FC = () => {
     // Also configure MCP service automatically with user-specified allocation and custom securities
     await configureMcpService(url, key, bondPercentage, sharePercentage, customSecuritiesParam);
     
-    // Expand MCP panel after successful analysis to show AI tools
+    // Expand both panels after successful analysis
+    setPortfolioFormExpanded(true);
     setMcpPanelExpanded(true);
   };
 
