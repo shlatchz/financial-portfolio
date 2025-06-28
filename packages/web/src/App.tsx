@@ -80,10 +80,7 @@ const PortfolioApp: React.FC = () => {
       // Also auto-configure MCP service with default distribution
       configureMcpService(env.defaultSpreadsheetUrl, env.defaultGoogleSheetsApiKey, env.fundsTypeDistributionBond, env.fundsTypeDistributionShare, env.customSecurities);
       
-      // Expand Portfolio form to show the auto-configured settings
-      setPortfolioFormExpanded(true);
-      // Expand MCP panel when auto-start is enabled
-      setMcpPanelExpanded(true);
+      // Keep accordions collapsed for clean auto-start experience
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
