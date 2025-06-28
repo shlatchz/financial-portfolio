@@ -14,7 +14,7 @@ import { usePortfolioData } from './hooks/usePortfolioData';
 import { env, validateEnv, getEnvInfo } from './config/env';
 import { APP_CONFIG, COMMON_STYLES } from './config/constants';
 import { McpApiService } from './services/mcpApiService';
-import { GoogleSheetsService } from '@portfolio/core';
+import { GoogleSheetsService, CustomSecurity } from '@portfolio/core';
 
 // Create a client with environment-based configuration
 const queryClient = new QueryClient({
@@ -30,6 +30,9 @@ const queryClient = new QueryClient({
 const PortfolioApp: React.FC = () => {
   const [spreadsheetUrl, setSpreadsheetUrl] = useState('');
   const [apiKey, setApiKey] = useState('');
+  const [bondPercentage, setBondPercentage] = useState(env.fundsTypeDistributionBond);
+  const [sharePercentage, setSharePercentage] = useState(env.fundsTypeDistributionShare);
+  const [customSecurities, setCustomSecurities] = useState(env.customSecurities);
   const [shouldAnalyze, setShouldAnalyze] = useState(false);
   const [isReanalyzing, setIsReanalyzing] = useState(false);
   const [envValid, setEnvValid] = useState(true);
@@ -41,7 +44,7 @@ const PortfolioApp: React.FC = () => {
   const mcpService = new McpApiService();
 
   // Helper function to configure MCP service
-  const configureMcpService = async (url: string, key: string) => {
+  const configureMcpService = async (url: string, key: string, bondPercentage: number, sharePercentage: number, customSecurities: CustomSecurity[]) => {
     try {
       setMcpConfigError(null);
       const spreadsheetId = GoogleSheetsService.extractSpreadsheetId(url);
@@ -49,9 +52,9 @@ const PortfolioApp: React.FC = () => {
         await mcpService.configurePortfolio({
           googleSheetsApiKey: key,
           spreadsheetId: spreadsheetId,
-          targetBondPercentage: env.fundsTypeDistributionBond,
-          targetSharePercentage: env.fundsTypeDistributionShare,
-          customSecurities: env.customSecurities
+          targetBondPercentage: bondPercentage,
+          targetSharePercentage: sharePercentage,
+          customSecurities: customSecurities
         });
         setMcpConfigured(true);
       }
@@ -72,8 +75,8 @@ const PortfolioApp: React.FC = () => {
       setApiKey(env.defaultGoogleSheetsApiKey);
       setShouldAnalyze(true);
       
-      // Also auto-configure MCP service
-      configureMcpService(env.defaultSpreadsheetUrl, env.defaultGoogleSheetsApiKey);
+      // Also auto-configure MCP service with default distribution
+      configureMcpService(env.defaultSpreadsheetUrl, env.defaultGoogleSheetsApiKey, env.fundsTypeDistributionBond, env.fundsTypeDistributionShare, env.customSecurities);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -81,10 +84,13 @@ const PortfolioApp: React.FC = () => {
   const { data: portfolioSummary, isLoading, error, refetch } = usePortfolioData({
     spreadsheetUrl,
     apiKey,
+    bondPercentage,
+    sharePercentage,
+    customSecurities,
     enabled: shouldAnalyze && !!spreadsheetUrl && !!apiKey && envValid
   });
 
-  const handleAnalyze = async (url: string, key: string) => {
+  const handleAnalyze = async (url: string, key: string, bondPercentage: number, sharePercentage: number, customSecuritiesParam: CustomSecurity[]) => {
     const isReAnalysis = url === spreadsheetUrl && key === apiKey && shouldAnalyze;
     
     if (isReAnalysis) {
@@ -92,7 +98,7 @@ const PortfolioApp: React.FC = () => {
       
       try {
         await queryClientInstance.invalidateQueries({
-          queryKey: ['portfolio', url, key, env.fundsTypeDistributionBond, env.fundsTypeDistributionShare, env.customSecurities]
+          queryKey: ['portfolio', url, key, bondPercentage, sharePercentage, customSecuritiesParam]
         });
         await refetch();
       } finally {
@@ -101,11 +107,14 @@ const PortfolioApp: React.FC = () => {
     } else {
       setSpreadsheetUrl(url);
       setApiKey(key);
+      setBondPercentage(bondPercentage);
+      setSharePercentage(sharePercentage);
+      setCustomSecurities(customSecuritiesParam);
       setShouldAnalyze(true);
     }
     
-    // Also configure MCP service automatically
-    await configureMcpService(url, key);
+    // Also configure MCP service automatically with user-specified allocation and custom securities
+    await configureMcpService(url, key, bondPercentage, sharePercentage, customSecuritiesParam);
   };
 
   const renderContent = () => {

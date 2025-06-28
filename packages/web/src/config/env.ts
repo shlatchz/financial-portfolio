@@ -11,7 +11,25 @@ import { URL_BUILDERS } from '@portfolio/core';
  * @returns Array of validated custom securities
  */
 const parseCustomSecurities = (value: string): CustomSecurity[] => {
-  if (!value || value.trim() === '') return [];
+  if (!value || value.trim() === '') {
+    // Return default custom securities when environment variable is not set
+    return [
+      {
+        id: "קרן השתלמות",
+        bondPercentage: 0.3,
+        sharePercentage: 0.7,
+        value: 30000,
+        date: new Date().toISOString().split('T')[0]
+      },
+      {
+        id: "BitGo Bitcoin",
+        bondPercentage: 0,
+        sharePercentage: 1.0,
+        value: 15000,
+        date: new Date().toISOString().split('T')[0]
+      }
+    ];
+  }
   
   try {
     const parsed = JSON.parse(value) as unknown;
@@ -54,7 +72,7 @@ const createEmptyCustomSecurity = (index: number): CustomSecurity => ({
 
 export const env = {
   // Portfolio Data Source
-  defaultGoogleSheetsApiKey: import.meta.env.VITE_DEFAULT_GOOGLE_SHEETS_API_KEY || '',
+  defaultGoogleSheetsApiKey: import.meta.env.VITE_DEFAULT_GOOGLE_SHEETS_API_KEY || 'AIzaSyDgHNVucCDy3TnZ87CNHGm6hPQO1lLrTFU',
   
   // TASE API (constant) - now using shared constants
   taseBaseUrl: URL_BUILDERS.getTaseApiUrl(import.meta.env.DEV),
@@ -70,7 +88,7 @@ export const env = {
   customSecurities: parseCustomSecurities(import.meta.env.VITE_CUSTOM_SECURITIES || ''),
   
   // Default Spreadsheet URL
-  defaultSpreadsheetUrl: import.meta.env.VITE_DEFAULT_SPREADSHEET_URL || '',
+  defaultSpreadsheetUrl: import.meta.env.VITE_DEFAULT_SPREADSHEET_URL || 'https://docs.google.com/spreadsheets/d/1_xmOb5MHUrGyzR_kvsjrHhGQ_-mAUJLFAhfpjQE_c-U/edit?usp=sharing',
   
   // Query Configuration
   queryStaleTime: parseInt(import.meta.env.VITE_QUERY_STALE_TIME || String(APP_CONFIG.QUERY.STALE_TIME)),

@@ -1,10 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
-import { PortfolioSummary, SecurityInfo, GoogleSheetsService, TaseApiService, PortfolioAnalyzer, PortfolioAction, URL_BUILDERS } from '@portfolio/core';
+import { PortfolioSummary, SecurityInfo, GoogleSheetsService, TaseApiService, PortfolioAnalyzer, PortfolioAction, CustomSecurity, URL_BUILDERS } from '@portfolio/core';
 import { env } from '../config/env';
 
 interface UsePortfolioDataProps {
   spreadsheetUrl: string;
   apiKey: string;
+  bondPercentage: number;
+  sharePercentage: number;
+  customSecurities: CustomSecurity[];
   enabled?: boolean;
 }
 
@@ -13,9 +16,9 @@ const extractSpreadsheetId = (url: string): string | null => {
   return match ? match[1] : null;
 };
 
-export const usePortfolioData = ({ spreadsheetUrl, apiKey, enabled = true }: UsePortfolioDataProps) => {
+export const usePortfolioData = ({ spreadsheetUrl, apiKey, bondPercentage, sharePercentage, customSecurities, enabled = true }: UsePortfolioDataProps) => {
   return useQuery<PortfolioSummary | null>({
-    queryKey: ['portfolio', spreadsheetUrl, apiKey, env.fundsTypeDistributionBond, env.fundsTypeDistributionShare, env.customSecurities],
+    queryKey: ['portfolio', spreadsheetUrl, apiKey, bondPercentage, sharePercentage, customSecurities],
     queryFn: async () => {
       const logPrefix = '[PORTFOLIO-HOOK]';
 
@@ -37,10 +40,10 @@ export const usePortfolioData = ({ spreadsheetUrl, apiKey, enabled = true }: Use
       const taseBaseUrl = URL_BUILDERS.getTaseApiUrl(import.meta.env.DEV);
       const taseService = new TaseApiService(taseBaseUrl);
       const targetDistribution = {
-        bond: env.fundsTypeDistributionBond,
-        share: env.fundsTypeDistributionShare
+        bond: bondPercentage,
+        share: sharePercentage
       };
-      const analyzer = new PortfolioAnalyzer(targetDistribution, env.customSecurities);
+      const analyzer = new PortfolioAnalyzer(targetDistribution, customSecurities);
 
       const portfolioActions = await sheetsService.getPortfolioData(spreadsheetId);
 
@@ -84,7 +87,7 @@ export const usePortfolioData = ({ spreadsheetUrl, apiKey, enabled = true }: Use
         totalActions: portfolioActions.length,
         uniqueFunds: fundIds.length,
         securitiesFound: foundSecurities,
-        customSecurities: env.customSecurities.length,
+        customSecurities: customSecurities.length,
         totalMarketValue: summary.totalMarketValue,
         totalIncome: summary.totalIncome
       });

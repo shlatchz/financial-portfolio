@@ -14,7 +14,7 @@ import {
 import { CloudUpload, Cable } from '@mui/icons-material';
 import { useTheme } from '@mui/material/styles';
 import { env } from '../config/env';
-import { GoogleSheetsService } from '@portfolio/core';
+import { GoogleSheetsService, CustomSecurity } from '@portfolio/core';
 import { APP_CONFIG, COMMON_STYLES } from '../config/constants';
 
 const getErrorMessage = (error: unknown): string => {
@@ -24,7 +24,7 @@ const getErrorMessage = (error: unknown): string => {
 };
 
 interface PortfolioFormProps {
-  onAnalyze: (spreadsheetUrl: string, apiKey: string) => void;
+  onAnalyze: (spreadsheetUrl: string, apiKey: string, bondPercentage: number, sharePercentage: number, customSecurities: CustomSecurity[]) => void;
   isLoading?: boolean;
   error?: string | null;
 }
@@ -33,13 +33,17 @@ const PortfolioForm: React.FC<PortfolioFormProps> = ({ onAnalyze, isLoading = fa
   const theme = useTheme();
   const [spreadsheetUrl, setSpreadsheetUrl] = useState(env.defaultSpreadsheetUrl);
   const [apiKey, setApiKey] = useState(env.defaultGoogleSheetsApiKey);
+  const [bondPercentage, setBondPercentage] = useState(env.fundsTypeDistributionBond * 100); // Convert to percentage for UI
+  const [sharePercentage, setSharePercentage] = useState(env.fundsTypeDistributionShare * 100); // Convert to percentage for UI
+  const [customSecurities, setCustomSecurities] = useState<CustomSecurity[]>(env.customSecurities);
   const [testResult, setTestResult] = useState<{ success: boolean; message: string; sheets?: string[] } | null>(null);
   const [isTesting, setIsTesting] = useState(false);
 
   const handleSubmit = (event: React.FormEvent): void => {
     event.preventDefault();
     if (spreadsheetUrl.trim() && apiKey.trim()) {
-      onAnalyze(spreadsheetUrl.trim(), apiKey.trim());
+      // Convert percentages back to decimals for the callback
+      onAnalyze(spreadsheetUrl.trim(), apiKey.trim(), bondPercentage / 100, sharePercentage / 100, customSecurities);
     }
   };
 
@@ -73,6 +77,32 @@ const PortfolioForm: React.FC<PortfolioFormProps> = ({ onAnalyze, isLoading = fa
     } finally {
       setIsTesting(false);
     }
+  };
+
+  // Custom Securities Management Functions
+  const addCustomSecurity = () => {
+    const newSecurity: CustomSecurity = {
+      id: `custom-${Date.now()}`,
+      bondPercentage: 0,
+      sharePercentage: 0,
+      value: 0,
+      date: new Date().toISOString().split('T')[0]
+    };
+    setCustomSecurities([...customSecurities, newSecurity]);
+  };
+
+  const updateCustomSecurity = (index: number, field: keyof CustomSecurity, value: string | number) => {
+    const updated = [...customSecurities];
+    if (field === 'bondPercentage' || field === 'sharePercentage' || field === 'value') {
+      updated[index] = { ...updated[index], [field]: Number(value) };
+    } else {
+      updated[index] = { ...updated[index], [field]: value };
+    }
+    setCustomSecurities(updated);
+  };
+
+  const removeCustomSecurity = (index: number) => {
+    setCustomSecurities(customSecurities.filter((_, i) => i !== index));
   };
 
   return (
@@ -185,6 +215,195 @@ const PortfolioForm: React.FC<PortfolioFormProps> = ({ onAnalyze, isLoading = fa
               },
             }}
           />
+
+          {/* Target Allocation Section */}
+          <Box sx={{ mb: 3 }}>
+            <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 2 }}>
+              Target Portfolio Allocation
+            </Typography>
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+              <TextField
+                label="Bonds (%)"
+                type="number"
+                value={bondPercentage}
+                onChange={(e) => {
+                  const value = Math.max(0, Math.min(100, parseFloat(e.target.value) || 0));
+                  setBondPercentage(value);
+                  setSharePercentage(100 - value);
+                }}
+                inputProps={{ min: 0, max: 100, step: 0.1 }}
+                disabled={isLoading}
+                sx={{
+                  flex: 1,
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: APP_CONFIG.UI.BUTTON_BORDER_RADIUS,
+                    background: 'rgba(255, 255, 255, 0.8)',
+                  },
+                }}
+                helperText="Target percentage for bond investments"
+              />
+              <TextField
+                label="Shares (%)"
+                type="number"
+                value={sharePercentage}
+                onChange={(e) => {
+                  const value = Math.max(0, Math.min(100, parseFloat(e.target.value) || 0));
+                  setSharePercentage(value);
+                  setBondPercentage(100 - value);
+                }}
+                inputProps={{ min: 0, max: 100, step: 0.1 }}
+                disabled={isLoading}
+                sx={{
+                  flex: 1,
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: APP_CONFIG.UI.BUTTON_BORDER_RADIUS,
+                    background: 'rgba(255, 255, 255, 0.8)',
+                  },
+                }}
+                helperText="Target percentage for share investments"
+              />
+            </Stack>
+            {Math.abs(bondPercentage + sharePercentage - 100) > 0.1 && (
+              <Typography variant="body2" color="warning.main" sx={{ mt: 1 }}>
+                ⚠️ Percentages should total 100% (currently {(bondPercentage + sharePercentage).toFixed(1)}%)
+              </Typography>
+            )}
+          </Box>
+
+          {/* Custom Securities Section */}
+          <Box sx={{ mb: 3 }}>
+            <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 2 }}>
+              Custom Securities (Pension Funds, etc.)
+            </Typography>
+            
+            {customSecurities.length === 0 ? (
+              <Box
+                sx={{
+                  p: 3,
+                  border: '2px dashed rgba(0, 0, 0, 0.12)',
+                  borderRadius: APP_CONFIG.UI.BUTTON_BORDER_RADIUS,
+                  textAlign: 'center',
+                  background: 'rgba(255, 255, 255, 0.5)',
+                }}
+              >
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                  No custom securities configured. Add pension funds or other non-market securities.
+                </Typography>
+                <Button
+                  variant="outlined"
+                  onClick={addCustomSecurity}
+                  disabled={isLoading}
+                  sx={{
+                    borderRadius: APP_CONFIG.UI.BUTTON_BORDER_RADIUS,
+                    fontWeight: 600,
+                  }}
+                >
+                  Add Custom Security
+                </Button>
+              </Box>
+            ) : (
+              <Stack spacing={2}>
+                {customSecurities.map((security, index) => (
+                  <Paper
+                    key={security.id}
+                    sx={{
+                      p: 3,
+                      background: 'rgba(255, 255, 255, 0.8)',
+                      borderRadius: APP_CONFIG.UI.BUTTON_BORDER_RADIUS,
+                      border: '1px solid rgba(0, 0, 0, 0.08)',
+                    }}
+                  >
+                    <Stack spacing={2}>
+                      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+                        <TextField
+                          label="Security ID"
+                          value={security.id}
+                          onChange={(e) => updateCustomSecurity(index, 'id', e.target.value)}
+                          disabled={isLoading}
+                          sx={{ flex: 2 }}
+                          helperText="Unique identifier (e.g., pension-fund-1)"
+                        />
+                        <TextField
+                          label="Value (₪)"
+                          type="number"
+                          value={security.value}
+                          onChange={(e) => updateCustomSecurity(index, 'value', e.target.value)}
+                          disabled={isLoading}
+                          sx={{ flex: 1 }}
+                          inputProps={{ min: 0, step: 100 }}
+                          helperText="Current value in NIS"
+                        />
+                        <TextField
+                          label="Date"
+                          type="date"
+                          value={security.date}
+                          onChange={(e) => updateCustomSecurity(index, 'date', e.target.value)}
+                          disabled={isLoading}
+                          sx={{ flex: 1 }}
+                          InputLabelProps={{ shrink: true }}
+                          helperText="Valuation date"
+                        />
+                      </Stack>
+                      
+                      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="end">
+                        <TextField
+                          label="Bond Allocation (%)"
+                          type="number"
+                          value={security.bondPercentage * 100}
+                          onChange={(e) => updateCustomSecurity(index, 'bondPercentage', Number(e.target.value) / 100)}
+                          disabled={isLoading}
+                          sx={{ flex: 1 }}
+                          inputProps={{ min: 0, max: 100, step: 0.1 }}
+                          helperText="% allocated to bonds"
+                        />
+                        <TextField
+                          label="Share Allocation (%)"
+                          type="number"
+                          value={security.sharePercentage * 100}
+                          onChange={(e) => updateCustomSecurity(index, 'sharePercentage', Number(e.target.value) / 100)}
+                          disabled={isLoading}
+                          sx={{ flex: 1 }}
+                          inputProps={{ min: 0, max: 100, step: 0.1 }}
+                          helperText="% allocated to shares"
+                        />
+                        <Button
+                          variant="outlined"
+                          color="error"
+                          onClick={() => removeCustomSecurity(index)}
+                          disabled={isLoading}
+                          sx={{
+                            minWidth: 100,
+                            borderRadius: APP_CONFIG.UI.BUTTON_BORDER_RADIUS,
+                          }}
+                        >
+                          Remove
+                        </Button>
+                      </Stack>
+                      
+                      {Math.abs(security.bondPercentage + security.sharePercentage - 1) > 0.001 && (
+                        <Typography variant="body2" color="warning.main" sx={{ mt: 1 }}>
+                          ⚠️ Allocations should total 100% (currently {((security.bondPercentage + security.sharePercentage) * 100).toFixed(1)}%)
+                        </Typography>
+                      )}
+                    </Stack>
+                  </Paper>
+                ))}
+                
+                <Button
+                  variant="outlined"
+                  onClick={addCustomSecurity}
+                  disabled={isLoading}
+                  sx={{
+                    borderRadius: APP_CONFIG.UI.BUTTON_BORDER_RADIUS,
+                    fontWeight: 600,
+                    alignSelf: 'flex-start',
+                  }}
+                >
+                  Add Another Security
+                </Button>
+              </Stack>
+            )}
+          </Box>
 
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ mb: 3 }}>
             <Button
