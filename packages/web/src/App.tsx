@@ -383,8 +383,6 @@ const PortfolioApp: React.FC = () => {
         <Fade in timeout={APP_CONFIG.ANIMATION.NORMAL} style={{ transitionDelay: '600ms' }}>
           <Box sx={{ mt: 6 }}>
             <McpPanel 
-              googleSheetsApiKey={apiKey} 
-              spreadsheetId={spreadsheetUrl ? spreadsheetUrl.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/)?.[1] : undefined}
               isAutoConfigured={mcpConfigured}
               autoConfigError={mcpConfigError}
             />
