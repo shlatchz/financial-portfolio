@@ -330,6 +330,47 @@ MIT - See [LICENSE](../../LICENSE) file for details.
 - **Issues**: [GitHub Issues](https://github.com/your-org/financial-portfolio-monorepo/issues)
 - **Live Demo**: [View Demo](https://financial-portfolio-shlatchz.netlify.app/)
 
+## Testing
+
+### Running Tests
+
+```bash
+# Run all tests
+npm test
+
+# Run tests in watch mode
+npm run test:watch
+
+# Run tests with UI
+npm run test:ui
+
+# Run coverage tests
+npm run test:coverage
+
+# Run proxy configuration tests specifically
+npm run test:proxy
+
+# Run end-to-end tests
+npm run test:e2e
+```
+
+### Proxy Configuration Tests
+
+The project includes comprehensive tests to prevent the API proxy configuration issues that occurred during development:
+
+- **`vite-config.test.ts`** - Tests the proxy configuration logic
+- **`api-proxy.test.ts`** - Integration tests for API proxy functionality
+- **`development-environment.test.ts`** - Tests environment-specific configurations
+- **`vite-config-validation.test.ts`** - Validates the actual vite.config.ts file
+- **`ci-proxy-validation.test.ts`** - CI-specific tests to prevent configuration regression
+
+These tests ensure that:
+- Proxy routes are correctly configured for both TASE API and MCP API
+- Path rewriting functions work properly
+- Error handling is configured
+- Development and production environments are handled correctly
+- The configuration is maintained during code changes
+
 ---
 
 **Made with ❤️ for investors and developers** 
