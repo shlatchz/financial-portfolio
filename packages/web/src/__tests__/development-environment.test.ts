@@ -1,4 +1,18 @@
 import { describe, it, expect, vi } from 'vitest';
+import {
+  API_ENDPOINTS,
+  TEST_DATA,
+  URL_PATTERNS,
+  ENVIRONMENT_CONFIGS,
+  ERROR_MESSAGES,
+  validateFundIds,
+  validatePathEncoding,
+  validateErrorMessages,
+  validateProxyConfigStructure,
+  validatePathRewriting,
+  validateNonMayaPathsUnaffected,
+  constructApiUrl
+} from '../test/test-utils';
 
 // Test development environment setup
 describe('Development Environment Configuration', () => {
@@ -10,12 +24,12 @@ describe('Development Environment Configuration', () => {
       
       // Simulate the logic from env.ts
       const isDev = true;
-      const mcpApiUrl = isDev ? 'http://localhost:8888/api/mcp' : '/api/mcp';
+      const mcpApiUrl = isDev ? API_ENDPOINTS.targets.netlifyDev + '/api/mcp' : API_ENDPOINTS.dev.mcpApi;
       
       // In development, frontend uses proxy routes
-      const frontendTaseUrl = '/api/maya';
+      const frontendTaseUrl = API_ENDPOINTS.dev.mayaApi;
       
-      expect(frontendTaseUrl).toBe('/api/maya');
+      expect(frontendTaseUrl).toBe(API_ENDPOINTS.dev.mayaApi);
       expect(mcpApiUrl).toBe('http://localhost:8888/api/mcp');
     });
 
@@ -26,155 +40,88 @@ describe('Development Environment Configuration', () => {
       
       // Simulate the logic from env.ts
       const isDev = false;
-      const mcpApiUrl = isDev ? 'http://localhost:8888/api/mcp' : '/api/mcp';
+      const mcpApiUrl = isDev ? API_ENDPOINTS.targets.netlifyDev + '/api/mcp' : API_ENDPOINTS.prod.mcpApi;
       
       // In production, use direct Netlify function URLs
-      const productionTaseUrl = '/.netlify/functions/maya-proxy';
+      const productionTaseUrl = API_ENDPOINTS.prod.mayaApi;
       
-      expect(productionTaseUrl).toBe('/.netlify/functions/maya-proxy');
+      expect(productionTaseUrl).toBe(API_ENDPOINTS.prod.mayaApi);
       expect(mcpApiUrl).toBe('/api/mcp');
     });
   });
 
   describe('API URL Construction', () => {
     it('should construct valid TASE API URLs for local development', () => {
-      const baseUrl = '/api/maya';
-      const fundId = '5113022';
-      const securityType = 'mutual';
-      
-      const fullUrl = `${baseUrl}/${securityType}/${fundId}`;
+      const fullUrl = constructApiUrl(
+        API_ENDPOINTS.dev.mayaApi,
+        TEST_DATA.sampleSecurityType,
+        TEST_DATA.sampleFundId
+      );
       
       expect(fullUrl).toBe('/api/maya/mutual/5113022');
       expect(fullUrl).toMatch(/^\/api\/maya\/\w+\/\d+$/);
     });
 
     it('should construct valid TASE API URLs for production', () => {
-      const baseUrl = '/.netlify/functions/maya-proxy';
-      const fundId = '5113022';
-      const securityType = 'mutual';
-      
-      const fullUrl = `${baseUrl}/${securityType}/${fundId}`;
+      const fullUrl = constructApiUrl(
+        API_ENDPOINTS.prod.mayaApi,
+        TEST_DATA.sampleSecurityType,
+        TEST_DATA.sampleFundId
+      );
       
       expect(fullUrl).toBe('/.netlify/functions/maya-proxy/mutual/5113022');
       expect(fullUrl).toMatch(/^\/\.netlify\/functions\/maya-proxy\/\w+\/\d+$/);
     });
 
     it('should validate fund ID format', () => {
-      const validFundIds = ['5113022', '1234567', '999'];
-      const invalidFundIds = ['', 'abc', '12.34', null, undefined];
-      
-      validFundIds.forEach(id => {
-        expect(id).toMatch(/^\d+$/);
-      });
-      
-      invalidFundIds.forEach(id => {
-        if (id) {
-          expect(id).not.toMatch(/^\d+$/);
-        }
-      });
+      validateFundIds(TEST_DATA.fundIds.valid, TEST_DATA.fundIds.invalid);
     });
 
     it('should handle URL path encoding correctly', () => {
-      const localPaths = [
-        '/api/maya/mutual/5113022',
-        '/api/maya/etf/1234',
-        '/api/mcp'
-      ];
-
-      const productionPaths = [
-        '/.netlify/functions/maya-proxy/mutual/5113022',
-        '/.netlify/functions/maya-proxy/etf/1234',
-        '/api/mcp'
-      ];
-      
-      [...localPaths, ...productionPaths].forEach(path => {
-        expect(path).not.toContain(' ');
-        expect(path).not.toContain('%');
-        expect(path.split('/').length).toBeGreaterThanOrEqual(3);
-      });
+      validatePathEncoding([...URL_PATTERNS.localPaths, ...URL_PATTERNS.productionPaths]);
     });
   });
 
   describe('Error Handling', () => {
     it('should provide helpful error messages for proxy failures', () => {
-      const proxyErrors = {
-        tase: 'TASE API proxy error - Check Netlify dev server',
-        mcp: 'MCP API proxy error - Netlify dev not running on port 8888',
-        generic: 'Proxy configuration error - Check vite.config.ts'
-      };
-      
-      Object.values(proxyErrors).forEach(error => {
-        expect(error).toContain('error');
-        expect(error.length).toBeGreaterThan(10);
-      });
+      validateErrorMessages(ERROR_MESSAGES.proxyErrors);
     });
 
     it('should validate proxy configuration structure', () => {
-      const proxyConfig = {
-        '/api/maya': {
-          target: 'http://localhost:8888/.netlify/functions/maya-proxy',
-          changeOrigin: true,
-          secure: false,
-          rewrite: (path: string) => path.replace(/^\/api\/maya/, '')
-        },
-        '/api/mcp': {
-          target: 'http://localhost:8888',
-          changeOrigin: true,
-          secure: false
+      // Using mock config content to validate structure
+      const mockConfigContent = `
+        proxy: {
+          '/api/maya': {
+            target: '${API_ENDPOINTS.targets.mayaProxy}',
+            changeOrigin: true,
+            secure: false,
+            rewrite: (path) => path.replace(/^/api/maya/, '')
+          },
+          '/api/mcp': {
+            target: '${API_ENDPOINTS.targets.netlifyDev}',
+            changeOrigin: true,
+            secure: false
+          }
         }
-      };
+      `;
       
-      // Validate TASE proxy config
-      expect(proxyConfig['/api/maya'].target).toMatch(/^http:\/\/localhost:8888/);
-      expect(proxyConfig['/api/maya'].changeOrigin).toBe(true);
-      expect(proxyConfig['/api/maya'].secure).toBe(false);
-      expect(proxyConfig['/api/maya'].rewrite).toBeTypeOf('function');
-      
-      // Validate MCP proxy config
-      expect(proxyConfig['/api/mcp'].target).toMatch(/^http:\/\/localhost:8888$/);
-      expect(proxyConfig['/api/mcp'].changeOrigin).toBe(true);
-      expect(proxyConfig['/api/mcp'].secure).toBe(false);
+      validateProxyConfigStructure(mockConfigContent);
     });
   });
 
   describe('Proxy Path Rewriting', () => {
     it('should rewrite TASE API paths correctly', () => {
-      const rewrite = (path: string) => path.replace(/^\/api\/maya/, '');
-      
-      const testCases = [
-        { input: '/api/maya/mutual/5113022', expected: '/mutual/5113022' },
-        { input: '/api/maya/etf/1234', expected: '/etf/1234' },
-        { input: '/api/maya/funds/search', expected: '/funds/search' },
-        { input: '/api/maya', expected: '' }
-      ];
-      
-      testCases.forEach(({ input, expected }) => {
-        expect(rewrite(input)).toBe(expected);
-      });
+      validatePathRewriting();
     });
 
     it('should not affect non-maya paths', () => {
-      const rewrite = (path: string) => path.replace(/^\/api\/maya/, '');
-      
-      const nonMayaPaths = [
-        '/api/mcp/test',
-        '/other/path',
-        '/maya/different'
-      ];
-      
-      nonMayaPaths.forEach(path => {
-        expect(rewrite(path)).toBe(path);
-      });
+      validateNonMayaPathsUnaffected();
     });
   });
 
   describe('Environment-Specific Behavior', () => {
     it('should handle local development with Netlify dev', () => {
-      const localConfig = {
-        netlifyDevPort: 8888,
-        viteDevPort: 5174, // Auto-selected since 5173 was in use
-        proxyEnabled: true
-      };
+      const localConfig = ENVIRONMENT_CONFIGS.development;
 
       expect(localConfig.netlifyDevPort).toBe(8888);
       expect(localConfig.viteDevPort).toBeGreaterThan(5173);
@@ -182,11 +129,7 @@ describe('Development Environment Configuration', () => {
     });
 
     it('should handle production deployment', () => {
-      const prodConfig = {
-        netlifyFunctions: true,
-        proxyEnabled: false,
-        directFunctionCalls: true
-      };
+      const prodConfig = ENVIRONMENT_CONFIGS.production;
 
       expect(prodConfig.netlifyFunctions).toBe(true);
       expect(prodConfig.proxyEnabled).toBe(false);

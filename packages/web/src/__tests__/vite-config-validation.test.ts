@@ -1,36 +1,40 @@
 import { describe, it, expect } from 'vitest';
-import { readFileSync, existsSync } from 'fs';
-import { join } from 'path';
+import {
+  getViteConfigPath,
+  readViteConfig,
+  validateProxyConfigStructure,
+  API_ENDPOINTS,
+  PORTS
+} from '../test/test-utils';
+import { existsSync } from 'fs';
 
 describe('Vite Config File Validation', () => {
-  const viteConfigPath = join(process.cwd(), 'vite.config.ts');
-
   it('should have vite.config.ts file present', () => {
-    expect(existsSync(viteConfigPath)).toBe(true);
+    expect(existsSync(getViteConfigPath())).toBe(true);
   });
 
   it('should contain proxy configuration for TASE API via Netlify function', () => {
-    const configContent = readFileSync(viteConfigPath, 'utf-8');
+    const configContent = readViteConfig();
     
     // Check for proxy configuration presence
     expect(configContent).toContain('proxy:');
-    expect(configContent).toContain("'/api/maya'");
-    expect(configContent).toContain('http://localhost:8888/.netlify/functions/maya-proxy');
+    expect(configContent).toContain("'/api/maya':");
+    expect(configContent).toContain(API_ENDPOINTS.targets.mayaProxy);
     expect(configContent).toContain('changeOrigin: true');
     expect(configContent).toContain('secure: false');
   });
 
   it('should contain proxy configuration for MCP API', () => {
-    const configContent = readFileSync(viteConfigPath, 'utf-8');
+    const configContent = readViteConfig();
     
-    expect(configContent).toContain("'/api/mcp'");
-    expect(configContent).toContain('http://localhost:8888');
+    expect(configContent).toContain("'/api/mcp':");
+    expect(configContent).toContain(API_ENDPOINTS.targets.netlifyDev);
     expect(configContent).toContain('changeOrigin: true');
     expect(configContent).toContain('secure: false');
   });
 
   it('should contain path rewrite function for TASE API', () => {
-    const configContent = readFileSync(viteConfigPath, 'utf-8');
+    const configContent = readViteConfig();
     
     expect(configContent).toContain('rewrite:');
     expect(configContent).toContain('path.replace');
@@ -39,15 +43,15 @@ describe('Vite Config File Validation', () => {
   });
 
   it('should have correct server port configuration', () => {
-    const configContent = readFileSync(viteConfigPath, 'utf-8');
+    const configContent = readViteConfig();
     
     expect(configContent).toContain('server:');
     expect(configContent).toContain('port:');
-    expect(configContent).toContain('5173');
+    expect(configContent).toContain(String(PORTS.viteDefault));
   });
 
   it('should be valid TypeScript syntax', () => {
-    const configContent = readFileSync(viteConfigPath, 'utf-8');
+    const configContent = readViteConfig();
     
     // Basic syntax checks
     expect(configContent).toContain('import');
@@ -60,7 +64,7 @@ describe('Vite Config File Validation', () => {
   });
 
   it('should maintain consistent formatting', () => {
-    const configContent = readFileSync(viteConfigPath, 'utf-8');
+    const configContent = readViteConfig();
     
     // Check for consistent indentation and structure
     const lines = configContent.split('\n');
@@ -76,7 +80,7 @@ describe('Vite Config File Validation', () => {
   });
 
   it('should contain both local development proxy configurations', () => {
-    const configContent = readFileSync(viteConfigPath, 'utf-8');
+    const configContent = readViteConfig();
     
     // Check that both proxy configurations are present
     const proxyConfigs = [
@@ -90,17 +94,17 @@ describe('Vite Config File Validation', () => {
   });
 
   it('should target localhost for development', () => {
-    const configContent = readFileSync(viteConfigPath, 'utf-8');
+    const configContent = readViteConfig();
     
     // Both proxies should target localhost:8888
-    expect(configContent).toContain('localhost:8888');
+    expect(configContent).toContain(`localhost:${PORTS.netlifyDev}`);
     expect(configContent).not.toContain('https://maya.tase.co.il');
     expect(configContent).not.toContain('https://mayaapi.tase.co.il');
   });
 
   describe('Proxy Configuration Structure', () => {
     it('should have correct proxy structure for Maya API', () => {
-      const configContent = readFileSync(viteConfigPath, 'utf-8');
+      const configContent = readViteConfig();
       
       // Check for expected structure elements
       const expectedElements = [
@@ -117,7 +121,7 @@ describe('Vite Config File Validation', () => {
     });
 
     it('should have correct proxy structure for MCP API', () => {
-      const configContent = readFileSync(viteConfigPath, 'utf-8');
+      const configContent = readViteConfig();
       
       // Check for expected structure elements
       const expectedElements = [
@@ -130,6 +134,11 @@ describe('Vite Config File Validation', () => {
       expectedElements.forEach(element => {
         expect(configContent).toContain(element);
       });
+    });
+
+    it('should validate proxy configuration structure', () => {
+      const configContent = readViteConfig();
+      validateProxyConfigStructure(configContent);
     });
   });
 }); 
