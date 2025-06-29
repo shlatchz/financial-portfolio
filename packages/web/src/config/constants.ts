@@ -59,6 +59,10 @@ export const APP_CONFIG = {
     BATCH_SIZE: 10,
   },
 
+  LINKS: {
+    GITHUB_REPOSITORY: 'https://github.com/shlatchz/financial-portfolio',
+  },
+
   FORMATS: {
     LOCALE: 'he-IL',
     CURRENCY: 'ILS',

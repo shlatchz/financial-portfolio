@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { QueryClient, QueryClientProvider, useQueryClient } from '@tanstack/react-query';
 import { ThemeProvider } from '@mui/material/styles';
-import { CssBaseline, Container, Typography, Box, CircularProgress, Stack, Alert, Paper, Fade, Grow, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
-import { TrendingUp, ExpandMore, CloudUpload, SmartToy } from '@mui/icons-material';
+import { CssBaseline, Container, Typography, Box, CircularProgress, Stack, Alert, Paper, Fade, Grow, Accordion, AccordionSummary, AccordionDetails, IconButton, Tooltip } from '@mui/material';
+import { TrendingUp, ExpandMore, CloudUpload, SmartToy, GitHub } from '@mui/icons-material';
 import { portfolioTheme } from './theme';
 import PortfolioForm from './components/PortfolioForm';
 import PortfolioSummaryCards from './components/PortfolioSummaryCards';
@@ -280,8 +280,33 @@ const PortfolioApp: React.FC = () => {
               p: 4,
               ...COMMON_STYLES.GLASS_MORPHISM,
               borderRadius: APP_CONFIG.UI.CARD_BORDER_RADIUS,
+              position: 'relative',
             }}
           >
+            {/* GitHub Link */}
+            <Tooltip title="View on GitHub" placement="left">
+              <IconButton
+                component="a"
+                href={APP_CONFIG.LINKS.GITHUB_REPOSITORY}
+                target="_blank"
+                rel="noopener noreferrer"
+                sx={{
+                  position: 'absolute',
+                  top: 16,
+                  right: 16,
+                  color: 'text.secondary',
+                  transition: `all ${APP_CONFIG.ANIMATION.NORMAL}ms ease`,
+                  '&:hover': {
+                    color: portfolioTheme.portfolioColors.primary.main,
+                    transform: 'scale(1.1)',
+                    backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                  },
+                }}
+              >
+                <GitHub sx={{ fontSize: 28 }} />
+              </IconButton>
+            </Tooltip>
+
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 3 }}>
               <Box 
                 sx={{ 
