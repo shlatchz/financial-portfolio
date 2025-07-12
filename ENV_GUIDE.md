@@ -59,6 +59,83 @@ The MCP server is configured at runtime through its API. No environment variable
 - **Spreadsheet ID**: Extract from your Google Sheets URL
 - **Target Distribution**: Bond/Share allocation percentages
 - **Custom Securities**: Pension funds, savings accounts, etc.
+  - **Static Values**: Fixed values with timestamps
+  - **API Integration**: Automatic value fetching from external APIs
+  - **Response Parsing**: JavaScript functions to extract values from API responses
+
+## 💼 Custom Securities Configuration
+
+Custom securities allow you to track investments that are not available through the TASE API, such as pension funds, savings accounts, or other financial instruments.
+
+### Basic Configuration
+
+```bash
+# Static custom securities in .env file
+VITE_CUSTOM_SECURITIES='[
+  {
+    "id": "pension-fund-1",
+    "bondPercentage": 0.3,
+    "sharePercentage": 0.7,
+    "value": 50000,
+    "date": "2024-01-01"
+  }
+]'
+```
+
+### API Integration
+
+For dynamic value fetching, you can configure API endpoints:
+
+```bash
+# API-integrated custom securities
+VITE_CUSTOM_SECURITIES='[
+  {
+    "id": "pension-fund-1",
+    "bondPercentage": 0.3,
+    "sharePercentage": 0.7,
+    "value": 50000,
+    "date": "2024-01-01",
+    "apiUrl": "https://api.pension-fund.com/balance",
+    "apiHeaders": {
+      "Authorization": "Bearer your-api-token",
+      "Content-Type": "application/json"
+    },
+    "apiResponseParser": "(data) => data.currentBalance"
+  }
+]'
+```
+
+### API Response Parsing
+
+The `apiResponseParser` field accepts a JavaScript function as a string that receives the API response and returns the current value:
+
+**Examples:**
+- Simple value extraction: `"(data) => data.value"`
+- Nested object: `"(data) => data.portfolio.currentBalance"`
+- Array processing: `"(data) => data.accounts.reduce((sum, acc) => sum + acc.balance, 0)"`
+- Complex calculations: `"(data) => data.principal + data.accruedInterest"`
+
+### Field Reference
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | string | Yes | Unique identifier for the security |
+| `bondPercentage` | number | Yes | Percentage allocated to bonds (0-1) |
+| `sharePercentage` | number | Yes | Percentage allocated to shares (0-1) |
+| `value` | number | Yes | Base/historical value |
+| `date` | string | Yes | Date of the base value (YYYY-MM-DD) |
+| `apiUrl` | string | No | API endpoint to fetch current value |
+| `apiHeaders` | object | No | HTTP headers for API requests |
+| `apiResponseParser` | string | No | JavaScript function to parse API response |
+| `currentValue` | number | No | Current value (auto-populated from API) |
+| `currentValueDate` | string | No | Date of current value (auto-populated) |
+
+### Security Considerations
+
+- **API Keys**: Store sensitive API keys in environment variables
+- **CORS**: Ensure API endpoints support CORS or use proxy servers
+- **Rate Limiting**: APIs are called periodically, consider rate limits
+- **Error Handling**: System falls back to static values if API fails
 
 ## 🔧 Development Setup
 

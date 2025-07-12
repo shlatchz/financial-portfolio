@@ -79,7 +79,7 @@ export class PortfolioMcpService {
     // Use optimized batch processing instead of sequential calls
     const securitiesInfo = await this.taseService.getMultipleSecurities(fundIds);
 
-    const summary = this.analyzer.analyzePortfolio(portfolioActions, securitiesInfo);
+    const summary = await this.analyzer.analyzePortfolio(portfolioActions, securitiesInfo);
 
     const formatCurrency = (amount) => `${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}₪`;
     const formatPercentage = (decimal) => `${(decimal * 100).toFixed(1)}%`;
@@ -158,7 +158,7 @@ ${summary.securities.map(s => `- ${s.name} (${s.id}): ${s.currentAmount.toLocale
     // Use optimized batch processing instead of sequential calls
     const securitiesInfo = await this.taseService.getMultipleSecurities(fundIds);
 
-    const summary = this.analyzer.analyzePortfolio(portfolioActions, securitiesInfo);
+    const summary = await this.analyzer.analyzePortfolio(portfolioActions, securitiesInfo);
     const rebalanceResult = this.analyzer.calculateRebalance(summary, additionalInvestment);
 
     const formatCurrency = (amount) => `${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}₪`;
@@ -212,7 +212,7 @@ ${summary.securities.map(s => `- ${s.name} (${s.id}): ${s.currentAmount.toLocale
     // Use optimized batch processing instead of sequential calls
     const securitiesInfo = await this.taseService.getMultipleSecurities(fundIds);
 
-    const summary = this.analyzer.analyzePortfolio(portfolioActions, securitiesInfo);
+    const summary = await this.analyzer.analyzePortfolio(portfolioActions, securitiesInfo);
 
     const formatCurrency = (amount) => `${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}₪`;
     const formatPercentage = (decimal) => `${(decimal * 100).toFixed(2)}%`;

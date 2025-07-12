@@ -26,7 +26,10 @@ const parseCustomSecurities = (value: string): CustomSecurity[] => {
         bondPercentage: 0,
         sharePercentage: 1.0,
         value: 15000,
-        date: new Date().toISOString().split('T')[0]
+        date: new Date().toISOString().split('T')[0],
+        apiUrl: 'https://min-api.cryptocompare.com/data/price?fsym=BTC&tsyms=ILS',
+        apiHeaders: {"Content-Type": "application/json"},
+        apiResponseParser: '(data) => 0.5 * data.ILS'
       }
     ];
   }
@@ -53,7 +56,12 @@ const parseCustomSecurities = (value: string): CustomSecurity[] => {
         bondPercentage: typeof sec.bondPercentage === 'number' ? sec.bondPercentage : 0,
         sharePercentage: typeof sec.sharePercentage === 'number' ? sec.sharePercentage : 0,
         value: typeof sec.value === 'number' ? sec.value : 0,
-        date: typeof sec.date === 'string' ? sec.date : new Date().toISOString().split('T')[0]
+        date: typeof sec.date === 'string' ? sec.date : new Date().toISOString().split('T')[0],
+        apiUrl: typeof sec.apiUrl === 'string' ? sec.apiUrl : undefined,
+        apiResponseParser: typeof sec.apiResponseParser === 'string' ? sec.apiResponseParser : undefined,
+        apiHeaders: typeof sec.apiHeaders === 'object' && sec.apiHeaders !== null ? sec.apiHeaders as Record<string, string> : undefined,
+        currentValue: typeof sec.currentValue === 'number' ? sec.currentValue : undefined,
+        currentValueDate: typeof sec.currentValueDate === 'string' ? sec.currentValueDate : undefined
       };
     });
   } catch (error) {
@@ -67,7 +75,12 @@ const createEmptyCustomSecurity = (index: number): CustomSecurity => ({
   bondPercentage: 0,
   sharePercentage: 0,
   value: 0,
-  date: new Date().toISOString().split('T')[0]
+  date: new Date().toISOString().split('T')[0],
+  apiUrl: undefined,
+  apiResponseParser: undefined,
+  apiHeaders: undefined,
+  currentValue: undefined,
+  currentValueDate: undefined
 });
 
 export const env = {

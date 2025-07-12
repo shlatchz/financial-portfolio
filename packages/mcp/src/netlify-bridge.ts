@@ -134,7 +134,12 @@ class NetlifyBridgeServer {
                       bondPercentage: { type: 'number' },
                       sharePercentage: { type: 'number' },
                       value: { type: 'number' },
-                      date: { type: 'string' }
+                      date: { type: 'string' },
+                      apiUrl: { type: 'string' },
+                      apiResponseParser: { type: 'string' },
+                      apiHeaders: { type: 'object' },
+                      currentValue: { type: 'number' },
+                      currentValueDate: { type: 'string' }
                     }
                   }
                 }

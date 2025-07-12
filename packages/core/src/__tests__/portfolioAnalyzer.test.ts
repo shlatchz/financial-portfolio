@@ -77,8 +77,8 @@ describe('PortfolioAnalyzer', () => {
   });
 
   describe('analyzePortfolio', () => {
-    it('should return proper portfolio summary structure', () => {
-      const summary = analyzer.analyzePortfolio(mockActions, mockSecurities);
+    it('should return proper portfolio summary structure', async () => {
+      const summary = await analyzer.analyzePortfolio(mockActions, mockSecurities);
       
       expect(summary).toHaveProperty('securities');
       expect(summary).toHaveProperty('customSecurities');
@@ -93,39 +93,39 @@ describe('PortfolioAnalyzer', () => {
       expect(Array.isArray(summary.customSecurities)).toBe(true);
     });
 
-    it('should calculate total net buy value correctly', () => {
-      const summary = analyzer.analyzePortfolio(mockActions, mockSecurities);
+    it('should calculate total net buy value correctly', async () => {
+      const summary = await analyzer.analyzePortfolio(mockActions, mockSecurities);
       
       // The analyzer correctly calculates based on actual units and prices
       expect(summary.totalNetBuyValue).toBeGreaterThan(0);
       expect(typeof summary.totalNetBuyValue).toBe('number');
     });
 
-    it('should calculate current market value based on current prices', () => {
-      const summary = analyzer.analyzePortfolio(mockActions, mockSecurities);
+    it('should calculate current market value based on current prices', async () => {
+      const summary = await analyzer.analyzePortfolio(mockActions, mockSecurities);
       
       // Note: We need to check the actual calculation based on units and current prices
       expect(summary.totalMarketValue).toBeGreaterThan(0);
       expect(typeof summary.totalMarketValue).toBe('number');
     });
 
-    it('should calculate total income (profit/loss)', () => {
-      const summary = analyzer.analyzePortfolio(mockActions, mockSecurities);
+    it('should calculate total income (profit/loss)', async () => {
+      const summary = await analyzer.analyzePortfolio(mockActions, mockSecurities);
       
       const expectedIncome = summary.totalMarketValue - summary.totalNetBuyValue;
       expect(summary.totalIncome).toBe(expectedIncome);
     });
 
-    it('should include custom securities', () => {
-      const summary = analyzer.analyzePortfolio(mockActions, mockSecurities);
+    it('should include custom securities', async () => {
+      const summary = await analyzer.analyzePortfolio(mockActions, mockSecurities);
       
       expect(summary.customSecurities).toHaveLength(1);
       expect(summary.customSecurities[0].id).toBe('pension-001');
       expect(summary.customSecurities[0].value).toBe(50000);
     });
 
-    it('should calculate fund type distribution', () => {
-      const summary = analyzer.analyzePortfolio(mockActions, mockSecurities);
+    it('should calculate fund type distribution', async () => {
+      const summary = await analyzer.analyzePortfolio(mockActions, mockSecurities);
       
       expect(summary.fundTypeDistribution).toHaveProperty('bond');
       expect(summary.fundTypeDistribution).toHaveProperty('share');
@@ -135,8 +135,8 @@ describe('PortfolioAnalyzer', () => {
       expect(summary.fundTypeDistribution.share).toBeLessThanOrEqual(1);
     });
 
-    it('should calculate cash balance correctly', () => {
-      const summary = analyzer.analyzePortfolio(mockActions, mockSecurities);
+    it('should calculate cash balance correctly', async () => {
+      const summary = await analyzer.analyzePortfolio(mockActions, mockSecurities);
       
       expect(summary.cashBalance).toHaveProperty('totalDeposits');
       expect(summary.cashBalance).toHaveProperty('totalCommissions');
@@ -148,8 +148,8 @@ describe('PortfolioAnalyzer', () => {
       expect(typeof summary.cashBalance.remainingCash).toBe('number');
     });
 
-    it('should handle securities with current market data', () => {
-      const summary = analyzer.analyzePortfolio(mockActions, mockSecurities);
+    it('should handle securities with current market data', async () => {
+      const summary = await analyzer.analyzePortfolio(mockActions, mockSecurities);
       
       expect(summary.securities.length).toBeGreaterThan(0);
       
@@ -165,16 +165,16 @@ describe('PortfolioAnalyzer', () => {
       }
     });
 
-    it('should set last transaction date', () => {
-      const summary = analyzer.analyzePortfolio(mockActions, mockSecurities);
+    it('should set last transaction date', async () => {
+      const summary = await analyzer.analyzePortfolio(mockActions, mockSecurities);
       
       expect(summary.lastTransactionDate).toBe('2024-01-03');
     });
   });
 
   describe('calculateRebalance', () => {
-    it('should return proper rebalance result structure', () => {
-      const summary = analyzer.analyzePortfolio(mockActions, mockSecurities);
+    it('should return proper rebalance result structure', async () => {
+      const summary = await analyzer.analyzePortfolio(mockActions, mockSecurities);
       const rebalance = analyzer.calculateRebalance(summary, 0);
       
       expect(rebalance).toHaveProperty('recommendations');
@@ -185,16 +185,16 @@ describe('PortfolioAnalyzer', () => {
       expect(Array.isArray(rebalance.recommendations)).toBe(true);
     });
 
-    it('should include target distribution in result', () => {
-      const summary = analyzer.analyzePortfolio(mockActions, mockSecurities);
+    it('should include target distribution in result', async () => {
+      const summary = await analyzer.analyzePortfolio(mockActions, mockSecurities);
       const rebalance = analyzer.calculateRebalance(summary, 0);
       
       expect(rebalance.targetDistribution.bond).toBe(0.2);
       expect(rebalance.targetDistribution.share).toBe(0.8);
     });
 
-    it('should handle additional investment', () => {
-      const summary = analyzer.analyzePortfolio(mockActions, mockSecurities);
+    it('should handle additional investment', async () => {
+      const summary = await analyzer.analyzePortfolio(mockActions, mockSecurities);
       const additionalInvestment = 20000;
       
       const rebalance = analyzer.calculateRebalance(summary, additionalInvestment);
@@ -204,8 +204,8 @@ describe('PortfolioAnalyzer', () => {
       expect(typeof rebalance.totalInvestment).toBe('number');
     });
 
-    it('should provide recommendations for each security', () => {
-      const summary = analyzer.analyzePortfolio(mockActions, mockSecurities);
+    it('should provide recommendations for each security', async () => {
+      const summary = await analyzer.analyzePortfolio(mockActions, mockSecurities);
       const rebalance = analyzer.calculateRebalance(summary, 0);
       
       expect(rebalance.recommendations.length).toBeGreaterThanOrEqual(0);
@@ -224,8 +224,8 @@ describe('PortfolioAnalyzer', () => {
   });
 
   describe('edge cases', () => {
-    it('should handle empty portfolio', () => {
-      const summary = analyzer.analyzePortfolio([], {});
+    it('should handle empty portfolio', async () => {
+      const summary = await analyzer.analyzePortfolio([], {});
       
       expect(summary.securities).toHaveLength(0);
       expect(summary.totalNetBuyValue).toBe(0);
@@ -235,7 +235,7 @@ describe('PortfolioAnalyzer', () => {
       expect(summary.cashBalance.totalCommissions).toBe(0);
     });
 
-    it('should handle missing security data', () => {
+    it('should handle missing security data', async () => {
       const actionsWithMissingSecurity: PortfolioAction[] = [
         {
           date: '2024-01-01',
@@ -247,13 +247,13 @@ describe('PortfolioAnalyzer', () => {
         }
       ];
 
-      const summary = analyzer.analyzePortfolio(actionsWithMissingSecurity, {});
+      const summary = await analyzer.analyzePortfolio(actionsWithMissingSecurity, {});
       
       // Should not include securities without market data
       expect(summary.securities).toHaveLength(0);
     });
 
-    it('should handle sell operations', () => {
+    it('should handle sell operations', async () => {
       const actionsWithSell: PortfolioAction[] = [
         ...mockActions,
         {
@@ -266,15 +266,15 @@ describe('PortfolioAnalyzer', () => {
         }
       ];
 
-      const summary = analyzer.analyzePortfolio(actionsWithSell, mockSecurities);
+      const summary = await analyzer.analyzePortfolio(actionsWithSell, mockSecurities);
       
       expect(summary.cashBalance.totalCommissions).toBe(60); // 25 + 20 + 15
       expect(summary.lastTransactionDate).toBe('2024-01-04');
     });
 
-    it('should handle zero target distribution gracefully', () => {
+    it('should handle zero target distribution gracefully', async () => {
       const extremeAnalyzer = new PortfolioAnalyzer({ bond: 0.0, share: 1.0 }, []);
-      const summary = extremeAnalyzer.analyzePortfolio(mockActions, mockSecurities);
+      const summary = await extremeAnalyzer.analyzePortfolio(mockActions, mockSecurities);
       const rebalance = extremeAnalyzer.calculateRebalance(summary, 0);
       
       expect(rebalance.targetDistribution.bond).toBe(0.0);

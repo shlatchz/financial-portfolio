@@ -248,80 +248,92 @@ const SecuritiesTable: React.FC<SecuritiesTableProps> = ({ summary }) => {
                       </Divider>
                     </TableCell>
                   </TableRow>
-                  {summary.customSecurities.map((customSecurity: CustomSecurity) => (
-                    <TableRow 
-                      key={`custom-${customSecurity.id}`} 
-                      sx={{ backgroundColor: theme.palette.action.hover }}
-                    >
-                      <TableCell component="th" scope="row">
-                        <Box>
-                          <Typography 
-                            variant="body1" 
-                            component="div"
-                            sx={{ 
-                              fontWeight: 'medium',
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: 1,
-                              flexDirection: 'row',
-                              ...getRTLTextStyles(customSecurity.id)
-                            }}
-                          >
-                            <Box component="span" sx={getIsolatedRTLTextStyles(customSecurity.id)}>
-                              {customSecurity.id}
-                            </Box>
-                          </Typography>
-                          <Typography variant="caption" color="text.secondary">
-                            Date: {customSecurity.date}
-                          </Typography>
-                        </Box>
-                      </TableCell>
-                      <TableCell>
-                        <Box sx={{ display: 'flex', gap: 0.5 }}>
-                          <Chip
-                            label="Custom"
-                            size="small"
-                            variant="outlined"
-                            color="info"
-                          />
-                          {customSecurity.bondPercentage > 0 && (
+                  {summary.customSecurities.map((customSecurity: CustomSecurity) => {
+                    const profitLoss = (customSecurity.currentValue ?? customSecurity.value) - customSecurity.value;
+                    return (
+                      <TableRow 
+                        key={`custom-${customSecurity.id}`} 
+                        sx={{ backgroundColor: theme.palette.action.hover }}
+                      >
+                        <TableCell component="th" scope="row">
+                          <Box>
+                            <Typography 
+                              variant="body1" 
+                              component="div"
+                              sx={{ 
+                                fontWeight: 'medium',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 1,
+                                flexDirection: 'row',
+                                ...getRTLTextStyles(customSecurity.id)
+                              }}
+                            >
+                              <Box component="span" sx={getIsolatedRTLTextStyles(customSecurity.id)}>
+                                {customSecurity.id}
+                              </Box>
+                            </Typography>
+                            <Typography variant="caption" color="text.secondary">
+                              Date: {customSecurity.date}
+                            </Typography>
+                          </Box>
+                        </TableCell>
+                        <TableCell>
+                          <Box sx={{ display: 'flex', gap: 0.5 }}>
                             <Chip
-                              icon={<AccountBalance />}
-                              label={`${(customSecurity.bondPercentage * 100).toFixed(0)}% Bond`}
-                              color="primary"
+                              label="Custom"
                               size="small"
                               variant="outlined"
+                              color="info"
                             />
+                            {customSecurity.bondPercentage > 0 && (
+                              <Chip
+                                icon={<AccountBalance />}
+                                label={`${(customSecurity.bondPercentage * 100).toFixed(0)}% Bond`}
+                                color="primary"
+                                size="small"
+                                variant="outlined"
+                              />
+                            )}
+                            {customSecurity.sharePercentage > 0 && (
+                              <Chip
+                                icon={<TrendingUp />}
+                                label={`${(customSecurity.sharePercentage * 100).toFixed(0)}% Share`}
+                                color="secondary"
+                                size="small"
+                                variant="outlined"
+                              />
+                            )}
+                          </Box>
+                        </TableCell>
+                        <TableCell align="right">
+                          <Typography variant="body2" color="text.secondary">
+                            Fixed
+                          </Typography>
+                        </TableCell>
+                        <TableCell align="right">
+                          {formatCurrency(customSecurity.value)}
+                        </TableCell>
+                        <TableCell align="right">
+                          {formatCurrency(customSecurity.currentValue ?? customSecurity.value)}
+                          {customSecurity.currentValue !== undefined && customSecurity.currentValueDate && (
+                            <Typography variant="caption" color="text.secondary" display="block">
+                              Updated: {customSecurity.currentValueDate}
+                            </Typography>
                           )}
-                          {customSecurity.sharePercentage > 0 && (
-                            <Chip
-                              icon={<TrendingUp />}
-                              label={`${(customSecurity.sharePercentage * 100).toFixed(0)}% Share`}
-                              color="secondary"
-                              size="small"
-                              variant="outlined"
-                            />
-                          )}
-                        </Box>
-                      </TableCell>
-                      <TableCell align="right">
-                        <Typography variant="body2" color="text.secondary">
-                          Fixed
-                        </Typography>
-                      </TableCell>
-                      <TableCell align="right">
-                        {formatCurrency(customSecurity.value)}
-                      </TableCell>
-                      <TableCell align="right">
-                        {formatCurrency(customSecurity.value)}
-                      </TableCell>
-                      <TableCell align="right">
-                        <Typography variant="body2" color="text.secondary">
-                          N/A
-                        </Typography>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                        </TableCell>
+                        <TableCell
+                          align="right"
+                          sx={{
+                            color: profitLoss >= 0 ? theme.portfolioColors.success.main : theme.portfolioColors.error.main,
+                            fontWeight: 'bold'
+                          }}
+                        >
+                          {formatCurrency(profitLoss)}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
                 </>
               )}
             </TableBody>

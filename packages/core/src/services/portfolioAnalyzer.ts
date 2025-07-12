@@ -1,11 +1,14 @@
 import { PortfolioAction, PortfolioSecurity, PortfolioSummary, SecurityInfo, FundAnalysis, RebalanceResult, RebalanceRecommendation, CustomSecurity } from '../types/index';
 import { Decimal } from 'decimal.js';
 import { APP_CONFIG } from '../config/constants';
+import { CustomSecuritiesService } from './customSecuritiesService';
 
 /**
  * Portfolio analysis service for processing transactions and calculating metrics
  */
 export class PortfolioAnalyzer {
+  private customSecuritiesService: CustomSecuritiesService;
+
   /**
    * Creates a new PortfolioAnalyzer instance.
    * 
@@ -15,12 +18,20 @@ export class PortfolioAnalyzer {
   constructor(
     private targetDistribution: { bond: number; share: number }, 
     private customSecurities: CustomSecurity[] = []
-  ) {}
+  ) {
+    this.customSecuritiesService = new CustomSecuritiesService();
+  }
 
   /**
-   * Analyzes portfolio based on transaction history and current market data
+   * Analyzes portfolio performance and returns comprehensive summary
+   * @param actions - Array of portfolio actions
+   * @param securitiesInfo - Market information for securities
+   * @returns Portfolio summary with analysis
    */
-  analyzePortfolio(actions: PortfolioAction[], securitiesInfo: Record<string, SecurityInfo>): PortfolioSummary {
+  async analyzePortfolio(actions: PortfolioAction[], securitiesInfo: Record<string, SecurityInfo>): Promise<PortfolioSummary> {
+    // Fetch current values for custom securities with API configuration
+    const updatedCustomSecurities = await this.customSecuritiesService.fetchCurrentValues(this.customSecurities);
+    
     const fundActions = this.groupActionsByFund(actions);
     const securities: PortfolioSecurity[] = [];
     let totalNetBuyValue = new Decimal(0);
@@ -60,12 +71,12 @@ export class PortfolioAnalyzer {
     }
 
     const lastTransactionDate = this.getLastTransactionDate(actions);
-    const fundTypeDistribution = this.calculateFundTypeDistribution(securities, this.customSecurities);
+    const fundTypeDistribution = this.calculateFundTypeDistribution(securities, updatedCustomSecurities);
     const remainingCash = totalDeposits.minus(totalNetBuyValue).minus(totalCommissions);
 
     return {
       securities,
-      customSecurities: this.customSecurities,
+      customSecurities: updatedCustomSecurities,
       totalNetBuyValue: totalNetBuyValue.toNumber(),
       totalMarketValue: totalMarketValue.toNumber(),
       totalIncome: totalMarketValue.minus(totalNetBuyValue).toNumber(),
@@ -80,7 +91,7 @@ export class PortfolioAnalyzer {
   }
 
   calculateRebalance(summary: PortfolioSummary, additionalInvestment: number): RebalanceResult {
-    const customSecuritiesTotal = this.customSecurities.reduce((sum, cs) => sum + cs.value, 0);
+    const customSecuritiesTotal = summary.customSecurities.reduce((sum, cs) => sum + (cs.currentValue ?? cs.value), 0);
     const currentTotalValue = new Decimal(summary.totalMarketValue).plus(customSecuritiesTotal);
     const newTotalValue = currentTotalValue.plus(additionalInvestment);
     
@@ -99,8 +110,9 @@ export class PortfolioAnalyzer {
       }
     }
     
-    for (const customSecurity of this.customSecurities) {
-      const customValue = new Decimal(customSecurity.value);
+    for (const customSecurity of summary.customSecurities) {
+      // Use currentValue if available, otherwise fall back to value
+      const customValue = new Decimal(customSecurity.currentValue ?? customSecurity.value);
       const bondPortion = customValue.times(customSecurity.bondPercentage);
       const sharePortion = customValue.times(customSecurity.sharePercentage);
       
@@ -305,7 +317,8 @@ export class PortfolioAnalyzer {
     }
     
     for (const customSecurity of customSecurities) {
-      const value = new Decimal(customSecurity.value);
+      // Use currentValue if available, otherwise fall back to value
+      const value = new Decimal(customSecurity.currentValue ?? customSecurity.value);
       const bondPortion = value.times(customSecurity.bondPercentage);
       const sharePortion = value.times(customSecurity.sharePercentage);
       
@@ -324,4 +337,6 @@ export class PortfolioAnalyzer {
       share: totalShareValue.dividedBy(totalValue).toNumber()
     };
   }
+
+
 } 

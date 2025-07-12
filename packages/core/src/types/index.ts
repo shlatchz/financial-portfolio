@@ -4,6 +4,15 @@ export interface CustomSecurity {
   sharePercentage: number;
   value: number;
   date: string;
+  
+  // API-related fields for fetching current values
+  apiUrl?: string;
+  apiResponseParser?: string; // JavaScript function as string to parse API response
+  apiHeaders?: Record<string, string>;
+  currentValue?: number;
+  currentValueDate?: string;
+  // If apiUrl is provided, currentValue will be fetched from API
+  // If apiUrl is not provided, currentValue defaults to value
 }
 
 export interface PortfolioAction {

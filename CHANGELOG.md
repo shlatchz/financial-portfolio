@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.0] - 2025-07-12
+
+### ✨ Custom Securities API Integration & UI Improvements
+- **Dynamic Value Fetching**: Custom securities now support API integration for fetching current values (with headers and custom response parsing).
+- **Profit/Loss Calculation**: The profit/loss column for custom securities now uses the latest current value (if available) and is color-coded.
+- **Flexible Configuration**: `.env` supports single-line JSON for custom securities, including API fields and parser functions.
+- **Graceful Fallback**: If API fetching fails, static values are used.
+
 ## [2.1.0] - 2024-12-28
 
 ### 🚀 Performance & Reliability Improvements

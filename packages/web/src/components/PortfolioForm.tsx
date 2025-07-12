@@ -85,14 +85,19 @@ const PortfolioForm: React.FC<PortfolioFormProps> = ({ onAnalyze, isLoading = fa
       bondPercentage: 0,
       sharePercentage: 0,
       value: 0,
-      date: new Date().toISOString().split('T')[0]
+      date: new Date().toISOString().split('T')[0],
+      apiUrl: undefined,
+      apiResponseParser: undefined,
+      apiHeaders: undefined,
+      currentValue: undefined,
+      currentValueDate: undefined
     };
     setCustomSecurities([...customSecurities, newSecurity]);
   };
 
-  const updateCustomSecurity = (index: number, field: keyof CustomSecurity, value: string | number) => {
+  const updateCustomSecurity = (index: number, field: keyof CustomSecurity, value: string | number | Record<string, string> | undefined) => {
     const updated = [...customSecurities];
-    if (field === 'bondPercentage' || field === 'sharePercentage' || field === 'value') {
+    if (field === 'bondPercentage' || field === 'sharePercentage' || field === 'value' || field === 'currentValue') {
       updated[index] = { ...updated[index], [field]: Number(value) };
     } else {
       updated[index] = { ...updated[index], [field]: value };
@@ -348,6 +353,76 @@ const PortfolioForm: React.FC<PortfolioFormProps> = ({ onAnalyze, isLoading = fa
                           Remove
                         </Button>
                       </Stack>
+                      
+                      {/* API Configuration - Advanced Section */}
+                      <Box sx={{ mt: 2 }}>
+                        <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                          API Configuration (Optional)
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 1 }}>
+                          Configure API endpoint to fetch current values automatically
+                        </Typography>
+                        
+                        <Stack spacing={2}>
+                          <TextField
+                            label="API URL"
+                            value={security.apiUrl || ''}
+                            onChange={(e) => updateCustomSecurity(index, 'apiUrl', e.target.value)}
+                            disabled={isLoading}
+                            placeholder="https://api.example.com/portfolio/value"
+                            helperText="API endpoint to fetch current value"
+                            fullWidth
+                          />
+                          
+                          {security.apiUrl && (
+                            <>
+                              <TextField
+                                label="Response Parser (JavaScript)"
+                                value={security.apiResponseParser || ''}
+                                onChange={(e) => updateCustomSecurity(index, 'apiResponseParser', e.target.value)}
+                                disabled={isLoading}
+                                placeholder="(data) => data.value"
+                                helperText="Function to extract value from API response (e.g., '(data) => data.portfolio.amount')"
+                                fullWidth
+                                multiline
+                                rows={2}
+                              />
+                              
+                              <TextField
+                                label="API Headers (JSON)"
+                                value={security.apiHeaders ? JSON.stringify(security.apiHeaders, null, 2) : ''}
+                                onChange={(e) => {
+                                  try {
+                                    const headers = e.target.value ? JSON.parse(e.target.value) : undefined;
+                                    updateCustomSecurity(index, 'apiHeaders', headers);
+                                  } catch (error) {
+                                    // Invalid JSON, keep the string value for editing
+                                  }
+                                }}
+                                disabled={isLoading}
+                                placeholder='{"Authorization": "Bearer your-token"}'
+                                helperText="Optional headers as JSON object"
+                                fullWidth
+                                multiline
+                                rows={3}
+                              />
+                            </>
+                          )}
+                          
+                          {security.currentValue !== undefined && (
+                            <Box sx={{ p: 2, backgroundColor: 'rgba(0, 0, 0, 0.05)', borderRadius: 1 }}>
+                              <Typography variant="body2" color="text.secondary">
+                                Current Value: {security.currentValue.toLocaleString()} ₪
+                              </Typography>
+                              {security.currentValueDate && (
+                                <Typography variant="caption" color="text.secondary">
+                                  Last updated: {security.currentValueDate}
+                                </Typography>
+                              )}
+                            </Box>
+                          )}
+                        </Stack>
+                      </Box>
                       
                       {Math.abs(security.bondPercentage + security.sharePercentage - 1) > 0.001 && (
                         <Typography variant="body2" color="warning.main" sx={{ mt: 1 }}>

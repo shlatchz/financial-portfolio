@@ -94,7 +94,7 @@ export class PortfolioMcpService {
       }
     }
 
-    const summary = this.analyzer.analyzePortfolio(portfolioActions, securitiesInfo);
+    const summary = await this.analyzer.analyzePortfolio(portfolioActions, securitiesInfo);
     
     const formatCurrency = (amount: number) => `${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}₪`;
     const formatPercentage = (decimal: number) => `${(decimal * 100).toFixed(1)}%`;
@@ -184,7 +184,7 @@ ${summary.securities.map(s => `- ${s.name} (${s.id}): ${s.currentAmount.toLocale
       }
     }
 
-    const summary = this.analyzer.analyzePortfolio(portfolioActions, securitiesInfo);
+    const summary = await this.analyzer.analyzePortfolio(portfolioActions, securitiesInfo);
     const rebalanceResult = this.analyzer.calculateRebalance(summary, additionalInvestment);
 
     const formatCurrency = (amount: number) => `${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}₪`;
@@ -250,7 +250,7 @@ ${summary.securities.map(s => `- ${s.name} (${s.id}): ${s.currentAmount.toLocale
       }
     }
 
-    const summary = this.analyzer.analyzePortfolio(portfolioActions, securitiesInfo);
+    const summary = await this.analyzer.analyzePortfolio(portfolioActions, securitiesInfo);
     
     const formatCurrency = (amount: number) => `${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}₪`;
     const formatPercentage = (decimal: number) => `${(decimal * 100).toFixed(2)}%`;

@@ -81,7 +81,7 @@ export const usePortfolioData = ({ spreadsheetUrl, apiKey, bondPercentage, share
       }
 
       const foundSecurities = Object.keys(securitiesInfo).length;
-      const summary = analyzer.analyzePortfolio(portfolioActions, securitiesInfo);
+      const summary = await analyzer.analyzePortfolio(portfolioActions, securitiesInfo);
 
       console.log(`${logPrefix} Portfolio analysis completed:`, {
         totalActions: portfolioActions.length,
